@@ -19,6 +19,10 @@ import {
   ChevronDown,
   Zap,
   UserPlus,
+  Calendar,
+  LocateIcon as Location,
+  Star,
+  Camera,
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
@@ -213,8 +217,7 @@ export default function VentureCraftersLanding() {
               className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
               onClick={() => {
                 setMobileMenuOpen(false)
-                // TODO: Add Pivot Hire URL when provided
-                console.log("Navigating to Pivot Hire...")
+                window.open("https://v0-pivot-hire.vercel.app/", "_blank")
               }}
             >
               <Zap className="mr-2 h-5 w-5" strokeWidth={1} />
@@ -226,8 +229,7 @@ export default function VentureCraftersLanding() {
               className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
               onClick={() => {
                 setMobileMenuOpen(false)
-                // TODO: Add community link when available
-                console.log("Joining community...")
+                window.open("https://chat.whatsapp.com/LliMQVE2glEESXvGD5mZ4h", "_blank")
               }}
             >
               <Users className="mr-2 h-5 w-5" strokeWidth={1} />
@@ -310,13 +312,12 @@ export default function VentureCraftersLanding() {
                         className="w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition-colors duration-200 font-light flex items-center text-sm"
                         onClick={() => {
                           setMicroSaasDropdownOpen(false)
-                          // TODO: Add Pivot Hire URL when provided
-                          console.log("Navigating to Pivot Hire...")
+                          window.open("https://v0-pivot-hire.vercel.app/", "_blank")
                         }}
                       >
                         <UserPlus className="mr-2 h-4 w-4" strokeWidth={1} />
                         Pivot Hire
-                        <span className="ml-auto text-xs text-gray-500">Coming Soon</span>
+                        <ArrowRight className="ml-auto h-3 w-3" strokeWidth={1} />
                       </button>
                     </div>
                   )}
@@ -326,8 +327,7 @@ export default function VentureCraftersLanding() {
                 <button
                   className="text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
                   onClick={() => {
-                    // TODO: Add community link when available
-                    console.log("Joining community...")
+                    window.open("https://chat.whatsapp.com/LliMQVE2glEESXvGD5mZ4h", "_blank")
                   }}
                 >
                   <Users className="mr-1 h-4 w-4" strokeWidth={1} />
@@ -584,8 +584,93 @@ export default function VentureCraftersLanding() {
         </div>
       </section>
 
+      {/* Wall of Events Section */}
+      <section className="py-24 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-20">
+            <Badge
+              variant="outline"
+              className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light mb-6 hover:scale-105 transition-transform duration-300"
+            >
+              <Camera className="w-4 h-4 mr-2" />
+              Community & Events
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">Wall of Events</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed">
+              From intimate founder meetups to large-scale conferences, we're building the startup ecosystem one event
+              at a time.
+            </p>
+          </div>
+
+          {/* Event Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+            {[
+              { number: "25+", label: "Events Hosted", icon: Calendar },
+              { number: "1000+", label: "Founders Connected", icon: Users },
+              { number: "50+", label: "Speakers Featured", icon: Star },
+              { number: "5", label: "Cities Covered", icon: Location },
+            ].map((stat, index) => (
+              <Card
+                key={index}
+                className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-300 group hover:scale-105 text-center"
+                style={{
+                  animationDelay: `${index * 0.1}s`,
+                }}
+              >
+                <CardContent className="p-6">
+                  <div className="w-8 h-8 mx-auto mb-4 text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <stat.icon className="w-full h-full" strokeWidth={1} />
+                  </div>
+                  <div className="text-2xl font-light text-gray-900 mb-2">{stat.number}</div>
+                  <p className="text-sm text-gray-500 font-light">{stat.label}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Events Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">{/* Event cards removed */}</div>
+
+          {/* Call to Action */}
+          <div className="text-center mt-16">
+            <Card className="max-w-2xl mx-auto border-0 shadow-none bg-white hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <CardContent className="p-8">
+                <Calendar className="h-8 w-8 text-gray-400 mx-auto mb-4" strokeWidth={1} />
+                <h3 className="text-xl font-light text-gray-900 mb-4">Join Our Next Event</h3>
+                <p className="text-gray-600 leading-relaxed mb-6 font-light">
+                  Be part of the startup community that's shaping the future. Connect, learn, and grow with like-minded
+                  founders.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button
+                    className="bg-gray-900 text-white hover:bg-gray-800 px-6 py-3 rounded-none font-light transition-all duration-300 hover:scale-105"
+                    onClick={() =>
+                      window.open(
+                        "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
+                        "_blank",
+                      )
+                    }
+                  >
+                    Register for Events
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-gray-300 text-gray-600 hover:bg-gray-50 px-6 py-3 rounded-none font-light transition-all duration-300 hover:scale-105"
+                    onClick={() => {
+                      window.open("https://chat.whatsapp.com/LliMQVE2glEESXvGD5mZ4h", "_blank")
+                    }}
+                  >
+                    Join Community
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials Section */}
-      <section className="py-24 px-6 bg-gray-50 overflow-hidden">
+      <section className="py-24 px-6 overflow-hidden">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">What Founders Say</h2>
@@ -699,7 +784,7 @@ export default function VentureCraftersLanding() {
                 .map((testimonial, index) => (
                   <Card
                     key={index}
-                    className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-300 hover:scale-105 hover:-translate-y-2 flex-shrink-0 w-80"
+                    className="border-0 shadow-none bg-gray-50 hover:shadow-lg transition-all duration-300 hover:scale-105 hover:-translate-y-2 flex-shrink-0 w-80"
                   >
                     <CardContent className="p-8">
                       <div className="flex items-center mb-4">
@@ -722,7 +807,7 @@ export default function VentureCraftersLanding() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-24 px-6">
+      <section id="contact" className="py-24 px-6 bg-gray-50">
         <div className="container mx-auto max-w-4xl">
           <div className="grid lg:grid-cols-2 gap-16">
             <div className="space-y-8">
@@ -773,7 +858,7 @@ export default function VentureCraftersLanding() {
             </div>
 
             <div className="space-y-8">
-              <Card className="border-0 shadow-none bg-gray-50 hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <Card className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-300 hover:scale-105">
                 <CardContent className="p-8">
                   <h3 className="text-xl font-light mb-4 text-gray-900">Start a Conversation</h3>
                   <p className="text-gray-600 mb-6 font-light leading-relaxed">
