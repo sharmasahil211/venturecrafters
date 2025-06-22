@@ -16,6 +16,9 @@ import {
   Code,
   Menu,
   X,
+  ChevronDown,
+  Zap,
+  UserPlus,
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
@@ -26,7 +29,9 @@ export default function VentureCraftersLanding() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [typedText, setTypedText] = useState("")
   const [currentTextIndex, setCurrentTextIndex] = useState(0)
+  const [microSaasDropdownOpen, setMicroSaasDropdownOpen] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const texts = ["We don't just consult.", "We co-op.", "We craft ventures."]
 
@@ -36,12 +41,21 @@ export default function VentureCraftersLanding() {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
 
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setMicroSaasDropdownOpen(false)
+      }
+    }
+
     window.addEventListener("scroll", handleScroll)
     window.addEventListener("mousemove", handleMouseMove)
+    document.addEventListener("mousedown", handleClickOutside)
 
     return () => {
       window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("mousemove", handleMouseMove)
+      document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [])
 
@@ -114,10 +128,15 @@ export default function VentureCraftersLanding() {
           from { transform: translateY(30px); opacity: 0; }
           to { transform: translateY(0); opacity: 1; }
         }
+        @keyframes slide-down {
+          from { transform: translateY(-10px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
         .animate-float { animation: float 6s ease-in-out infinite; }
         .animate-pulse-slow { animation: pulse-slow 4s ease-in-out infinite; }
         .animate-slide-in { animation: slide-in 0.8s ease-out; }
         .animate-fade-in-up { animation: fade-in-up 0.6s ease-out; }
+        .animate-slide-down { animation: slide-down 0.3s ease-out; }
         @keyframes scroll {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
@@ -188,6 +207,33 @@ export default function VentureCraftersLanding() {
             >
               Contact
             </a>
+
+            {/* Micro SaaS Mobile */}
+            <button
+              className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
+              onClick={() => {
+                setMobileMenuOpen(false)
+                // TODO: Add Pivot Hire URL when provided
+                console.log("Navigating to Pivot Hire...")
+              }}
+            >
+              <Zap className="mr-2 h-5 w-5" strokeWidth={1} />
+              Micro SaaS
+            </button>
+
+            {/* Join Community Mobile */}
+            <button
+              className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
+              onClick={() => {
+                setMobileMenuOpen(false)
+                // TODO: Add community link when available
+                console.log("Joining community...")
+              }}
+            >
+              <Users className="mr-2 h-5 w-5" strokeWidth={1} />
+              Join Community
+            </button>
+
             <Button
               className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-3 rounded-none font-light transition-all duration-300 hover:scale-105"
               onClick={() => {
@@ -242,6 +288,51 @@ export default function VentureCraftersLanding() {
                 >
                   Contact
                 </a>
+
+                {/* Micro SaaS Dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    className="text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
+                    onClick={() => setMicroSaasDropdownOpen(!microSaasDropdownOpen)}
+                  >
+                    <Zap className="mr-1 h-4 w-4" strokeWidth={1} />
+                    Micro SaaS
+                    <ChevronDown
+                      className={`ml-1 h-3 w-3 transition-transform duration-300 ${microSaasDropdownOpen ? "rotate-180" : ""}`}
+                      strokeWidth={1}
+                    />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {microSaasDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 rounded-none shadow-lg animate-slide-down z-50">
+                      <button
+                        className="w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-50 transition-colors duration-200 font-light flex items-center text-sm"
+                        onClick={() => {
+                          setMicroSaasDropdownOpen(false)
+                          // TODO: Add Pivot Hire URL when provided
+                          console.log("Navigating to Pivot Hire...")
+                        }}
+                      >
+                        <UserPlus className="mr-2 h-4 w-4" strokeWidth={1} />
+                        Pivot Hire
+                        <span className="ml-auto text-xs text-gray-500">Coming Soon</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Join Community Button */}
+                <button
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
+                  onClick={() => {
+                    // TODO: Add community link when available
+                    console.log("Joining community...")
+                  }}
+                >
+                  <Users className="mr-1 h-4 w-4" strokeWidth={1} />
+                  Join Community
+                </button>
               </div>
             </div>
             <Button
@@ -323,6 +414,7 @@ export default function VentureCraftersLanding() {
               </p>
             </div>
 
+            {/* Enhanced CTA Buttons - Keep only primary actions */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up">
               <Button
                 size="lg"
@@ -336,6 +428,7 @@ export default function VentureCraftersLanding() {
               >
                 Start Your Journey
               </Button>
+
               <Button
                 size="lg"
                 variant="outline"
