@@ -151,62 +151,69 @@ export default function VentureCraftersLanding() {
         .animate-scroll:hover {
           animation-play-state: paused;
         }
+        
+        /* Mobile-specific optimizations */
+        @media (max-width: 768px) {
+          .animate-float { animation: none; }
+          .animate-pulse-slow { animation: none; }
+          .animate-scroll { animation-duration: 40s; }
+        }
       `}</style>
 
       <AnimatedBackground />
       <FloatingParticles />
 
-      {/* Logo */}
-      <div className="fixed top-6 left-6 z-50">
+      {/* Logo - Mobile optimized */}
+      <div className="fixed top-4 left-4 md:top-6 md:left-6 z-50">
         <Link href="/" className="group">
           <img
             src="/images/venturecrafters-text-logo.png"
             alt="VentureCrafters"
-            className="h-10 w-auto opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
+            className="h-8 md:h-10 w-auto opacity-80 hover:opacity-100 transition-all duration-300 hover:scale-105"
           />
         </Link>
       </div>
 
-      {/* Mobile Menu Button */}
-      <div className="fixed top-6 right-6 z-50 md:hidden">
+      {/* Mobile Menu Button - Improved touch target */}
+      <div className="fixed top-4 right-4 md:top-6 md:right-6 z-50 md:hidden">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300 hover:scale-105"
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all duration-300 hover:scale-105 p-3"
         >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu - Full screen overlay */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-40 bg-white md:hidden animate-fade-in-up">
-          <div className="flex flex-col items-center justify-center h-full space-y-8 text-center">
+          <div className="flex flex-col items-center justify-center h-full space-y-8 text-center px-6">
             <Link
               href="/about"
-              className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105"
+              className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </Link>
-            <a
-              href="#services"
-              className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105"
+            <Link
+              href="/services"
+              className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
               Services
-            </a>
+            </Link>
             <Link
               href="/portfolio"
-              className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105"
+              className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
               Portfolio
             </Link>
             <a
               href="#contact"
-              className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105"
+              className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
@@ -214,30 +221,30 @@ export default function VentureCraftersLanding() {
 
             {/* Micro SaaS Mobile */}
             <button
-              className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
+              className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center py-2"
               onClick={() => {
                 setMobileMenuOpen(false)
                 window.open("https://v0-pivot-hire.vercel.app/", "_blank")
               }}
             >
-              <Zap className="mr-2 h-5 w-5" strokeWidth={1} />
+              <Zap className="mr-3 h-6 w-6" strokeWidth={1} />
               Micro SaaS
             </button>
 
             {/* Join Community Mobile */}
             <button
-              className="text-xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center"
+              className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105 flex items-center py-2"
               onClick={() => {
                 setMobileMenuOpen(false)
                 window.open("https://chat.whatsapp.com/LliMQVE2glEESXvGD5mZ4h", "_blank")
               }}
             >
-              <Users className="mr-2 h-5 w-5" strokeWidth={1} />
+              <Users className="mr-3 h-6 w-6" strokeWidth={1} />
               Join Community
             </button>
 
             <Button
-              className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-3 rounded-none font-light transition-all duration-300 hover:scale-105"
+              className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-4 rounded-none font-light transition-all duration-300 hover:scale-105 text-lg mt-4"
               onClick={() => {
                 setMobileMenuOpen(false)
                 window.open(
@@ -252,7 +259,7 @@ export default function VentureCraftersLanding() {
         </div>
       )}
 
-      {/* Desktop Navigation */}
+      {/* Desktop Navigation - Hidden on mobile */}
       <nav
         className={`fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-100 transition-all duration-300 hidden md:block ${
           scrollY > 50 ? "shadow-sm" : ""
@@ -272,12 +279,12 @@ export default function VentureCraftersLanding() {
                 >
                   About
                 </Link>
-                <a
-                  href="#services"
+                <Link
+                  href="/services"
                   className="text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105"
                 >
                   Services
-                </a>
+                </Link>
                 <Link
                   href="/portfolio"
                   className="text-gray-600 hover:text-gray-900 transition-all duration-300 hover:scale-105"
@@ -350,16 +357,16 @@ export default function VentureCraftersLanding() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Mobile optimized */}
       <section
         ref={heroRef}
-        className="min-h-screen flex items-center pt-20 pb-16 px-6 relative"
+        className="min-h-screen flex items-center pt-20 md:pt-20 pb-16 px-4 md:px-6 relative"
         style={{
           transform: `translateY(${scrollY * 0.1}px)`,
         }}
       >
-        {/* Floating geometric shapes */}
-        <div className="absolute inset-0 pointer-events-none">
+        {/* Floating geometric shapes - Reduced on mobile */}
+        <div className="absolute inset-0 pointer-events-none hidden md:block">
           <div
             className="absolute w-32 h-32 border border-gray-200 rounded-full animate-float opacity-20"
             style={{
@@ -387,18 +394,18 @@ export default function VentureCraftersLanding() {
         </div>
 
         <div className="container mx-auto max-w-4xl relative z-10">
-          <div className="text-center space-y-12">
-            <div className="space-y-8">
+          <div className="text-center space-y-8 md:space-y-12">
+            <div className="space-y-6 md:space-y-8">
               <div className="inline-block animate-fade-in-up">
                 <Badge
                   variant="outline"
-                  className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light hover:scale-105 transition-transform duration-300"
+                  className="border-gray-200 text-gray-600 px-3 py-2 md:px-4 md:py-2 rounded-full font-light hover:scale-105 transition-transform duration-300 text-sm md:text-base"
                 >
                   Trusted by 50+ Startups
                 </Badge>
               </div>
 
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight leading-tight tracking-tight animate-slide-in">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extralight leading-tight tracking-tight animate-slide-in">
                 <span className="block text-gray-900">We don't just</span>
                 <span className="block text-gray-900">consult.</span>
                 <span className="block text-gray-400 italic">
@@ -407,18 +414,18 @@ export default function VentureCraftersLanding() {
                 </span>
               </h1>
 
-              <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-light animate-fade-in-up">
+              <p className="text-lg md:text-xl lg:text-2xl text-gray-600 max-w-2xl mx-auto leading-relaxed font-light animate-fade-in-up px-4 md:px-0">
                 Ex-founders, VCs, and operators who've been in the trenches.
                 <br />
                 Your success is our obsession.
               </p>
             </div>
 
-            {/* Enhanced CTA Buttons - Keep only primary actions */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up">
+            {/* Enhanced CTA Buttons - Mobile optimized */}
+            <div className="flex flex-col gap-4 justify-center items-center animate-fade-in-up px-4 md:px-0">
               <Button
                 size="lg"
-                className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                className="bg-gray-900 text-white hover:bg-gray-800 px-6 py-3 md:px-8 md:py-4 rounded-none font-light text-base md:text-lg transition-all duration-300 hover:scale-105 hover:shadow-lg w-full sm:w-auto"
                 onClick={() =>
                   window.open(
                     "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
@@ -432,49 +439,51 @@ export default function VentureCraftersLanding() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-gray-300 text-gray-600 hover:bg-gray-50 px-8 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                className="border-gray-300 text-gray-600 hover:bg-gray-50 px-6 py-3 md:px-8 md:py-4 rounded-none font-light text-base md:text-lg transition-all duration-300 hover:scale-105 hover:shadow-lg w-full sm:w-auto"
                 onClick={() => window.open("https://youtu.be/0wrCxUtWM7E", "_blank")}
               >
                 Watch Our Story
               </Button>
             </div>
 
-            {/* Trust Indicators */}
-            <div className="grid grid-cols-3 gap-8 max-w-md mx-auto pt-16 border-t border-gray-100 animate-fade-in-up">
+            {/* Trust Indicators - Mobile optimized */}
+            <div className="grid grid-cols-3 gap-4 md:gap-8 max-w-sm md:max-w-md mx-auto pt-12 md:pt-16 border-t border-gray-100 animate-fade-in-up">
               <div className="text-center group hover:scale-105 transition-transform duration-300">
-                <div className="text-2xl font-light text-gray-900">$600K+</div>
-                <div className="text-sm text-gray-500 font-light">Raised</div>
+                <div className="text-xl md:text-2xl font-light text-gray-900">$600K+</div>
+                <div className="text-xs md:text-sm text-gray-500 font-light">Raised</div>
               </div>
               <div className="text-center group hover:scale-105 transition-transform duration-300">
-                <div className="text-2xl font-light text-gray-900">12+</div>
-                <div className="text-sm text-gray-500 font-light">MVPs Built</div>
+                <div className="text-xl md:text-2xl font-light text-gray-900">12+</div>
+                <div className="text-xs md:text-sm text-gray-500 font-light">MVPs Built</div>
               </div>
               <div className="text-center group hover:scale-105 transition-transform duration-300">
-                <div className="text-2xl font-light text-gray-900">100+</div>
-                <div className="text-sm text-gray-500 font-light">Connections</div>
+                <div className="text-xl md:text-2xl font-light text-gray-900">100+</div>
+                <div className="text-xs md:text-sm text-gray-500 font-light">Connections</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* Services Section - Mobile optimized */}
       <section
         id="services"
-        className="py-24 px-6 bg-gray-50 relative"
+        className="py-16 md:py-24 px-4 md:px-6 bg-gray-50 relative"
         style={{
           transform: `translateY(${scrollY * 0.05}px)`,
         }}
       >
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900 animate-fade-in-up">What We Do</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed animate-fade-in-up">
+          <div className="text-center mb-12 md:mb-20">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extralight mb-4 md:mb-6 text-gray-900 animate-fade-in-up">
+              What We Do
+            </h2>
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed animate-fade-in-up px-4 md:px-0">
               From zero to hero, we've got every stage of your startup journey covered.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
               {
                 icon: Lightbulb,
@@ -514,12 +523,12 @@ export default function VentureCraftersLanding() {
                   animationDelay: `${index * 0.1}s`,
                 }}
               >
-                <CardContent className="p-8">
-                  <div className="w-12 h-12 mb-6 text-gray-400 group-hover:text-gray-600 transition-all duration-300 group-hover:scale-110">
+                <CardContent className="p-6 md:p-8">
+                  <div className="w-10 h-10 md:w-12 md:h-12 mb-4 md:mb-6 text-gray-400 group-hover:text-gray-600 transition-all duration-300 group-hover:scale-110">
                     <service.icon className="w-full h-full" strokeWidth={1} />
                   </div>
-                  <h3 className="text-xl font-light mb-4 text-gray-900">{service.title}</h3>
-                  <p className="text-gray-600 leading-relaxed font-light">{service.desc}</p>
+                  <h3 className="text-lg md:text-xl font-light mb-3 md:mb-4 text-gray-900">{service.title}</h3>
+                  <p className="text-gray-600 leading-relaxed font-light text-sm md:text-base">{service.desc}</p>
                 </CardContent>
               </Card>
             ))}
@@ -527,17 +536,17 @@ export default function VentureCraftersLanding() {
         </div>
       </section>
 
-      {/* Portfolio Section */}
-      <section id="portfolio" className="py-24 px-6">
+      {/* Portfolio Section - Mobile optimized */}
+      <section id="portfolio" className="py-16 md:py-24 px-4 md:px-6">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">Our Work</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed">
+          <div className="text-center mb-12 md:mb-20">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extralight mb-4 md:mb-6 text-gray-900">Our Work</h2>
+            <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-light leading-relaxed px-4 md:px-0">
               Startups we've helped build, scale, and succeed.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
             {[
               { name: "SamparkBindhu", logo: "/images/portfolio/samparkbindhu.png" },
               { name: "CXFirst", logo: "/images/portfolio/cxfirst.jpeg" },
@@ -555,7 +564,7 @@ export default function VentureCraftersLanding() {
                   animationDelay: `${index * 0.05}s`,
                 }}
               >
-                <CardContent className="p-6 flex items-center justify-center h-24">
+                <CardContent className="p-4 md:p-6 flex items-center justify-center h-16 md:h-24">
                   <img
                     src={client.logo || "/placeholder.svg"}
                     alt={`${client.name} Logo`}
@@ -566,10 +575,10 @@ export default function VentureCraftersLanding() {
             ))}
           </div>
 
-          <div className="text-center mt-16">
+          <div className="text-center mt-12 md:mt-16">
             <Button
               variant="outline"
-              className="border-gray-300 text-gray-600 hover:bg-gray-50 px-8 py-3 rounded-none font-light transition-all duration-300 hover:scale-105 hover:shadow-lg"
+              className="border-gray-300 text-gray-600 hover:bg-gray-50 px-6 py-3 md:px-8 md:py-3 rounded-none font-light transition-all duration-300 hover:scale-105 hover:shadow-lg"
               onClick={() =>
                 window.open(
                   "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
@@ -584,26 +593,28 @@ export default function VentureCraftersLanding() {
         </div>
       </section>
 
-      {/* Wall of Events Section */}
-      <section className="py-24 px-6 bg-gray-50">
+      {/* Wall of Events Section - Mobile optimized */}
+      <section className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
         <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-20">
+          <div className="text-center mb-12 md:mb-20">
             <Badge
               variant="outline"
-              className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light mb-6 hover:scale-105 transition-transform duration-300"
+              className="border-gray-200 text-gray-600 px-3 py-2 md:px-4 md:py-2 rounded-full font-light mb-4 md:mb-6 hover:scale-105 transition-transform duration-300 text-sm md:text-base"
             >
-              <Camera className="w-4 h-4 mr-2" />
+              <Camera className="w-3 h-3 md:w-4 md:h-4 mr-2" />
               Community & Events
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">Wall of Events</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extralight mb-4 md:mb-6 text-gray-900">
+              Wall of Events
+            </h2>
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto font-light leading-relaxed px-4 md:px-0">
               From intimate founder meetups to large-scale conferences, we're building the startup ecosystem one event
               at a time.
             </p>
           </div>
 
-          {/* Event Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+          {/* Event Stats - Mobile optimized */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-12 md:mb-16">
             {[
               { number: "25+", label: "Events Hosted", icon: Calendar },
               { number: "1000+", label: "Founders Connected", icon: Users },
@@ -617,33 +628,30 @@ export default function VentureCraftersLanding() {
                   animationDelay: `${index * 0.1}s`,
                 }}
               >
-                <CardContent className="p-6">
-                  <div className="w-8 h-8 mx-auto mb-4 text-gray-400 group-hover:text-gray-600 transition-colors">
+                <CardContent className="p-4 md:p-6">
+                  <div className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-3 md:mb-4 text-gray-400 group-hover:text-gray-600 transition-colors">
                     <stat.icon className="w-full h-full" strokeWidth={1} />
                   </div>
-                  <div className="text-2xl font-light text-gray-900 mb-2">{stat.number}</div>
-                  <p className="text-sm text-gray-500 font-light">{stat.label}</p>
+                  <div className="text-xl md:text-2xl font-light text-gray-900 mb-1 md:mb-2">{stat.number}</div>
+                  <p className="text-xs md:text-sm text-gray-500 font-light">{stat.label}</p>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          {/* Events Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">{/* Event cards removed */}</div>
-
-          {/* Call to Action */}
-          <div className="text-center mt-16">
+          {/* Call to Action - Mobile optimized */}
+          <div className="text-center mt-12 md:mt-16">
             <Card className="max-w-2xl mx-auto border-0 shadow-none bg-white hover:shadow-lg transition-all duration-300 hover:scale-105">
-              <CardContent className="p-8">
-                <Calendar className="h-8 w-8 text-gray-400 mx-auto mb-4" strokeWidth={1} />
-                <h3 className="text-xl font-light text-gray-900 mb-4">Join Our Next Event</h3>
-                <p className="text-gray-600 leading-relaxed mb-6 font-light">
+              <CardContent className="p-6 md:p-8">
+                <Calendar className="h-6 w-6 md:h-8 md:w-8 text-gray-400 mx-auto mb-3 md:mb-4" strokeWidth={1} />
+                <h3 className="text-lg md:text-xl font-light text-gray-900 mb-3 md:mb-4">Join Our Next Event</h3>
+                <p className="text-gray-600 leading-relaxed mb-4 md:mb-6 font-light text-sm md:text-base">
                   Be part of the startup community that's shaping the future. Connect, learn, and grow with like-minded
                   founders.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col gap-3 md:gap-4 justify-center">
                   <Button
-                    className="bg-gray-900 text-white hover:bg-gray-800 px-6 py-3 rounded-none font-light transition-all duration-300 hover:scale-105"
+                    className="bg-gray-900 text-white hover:bg-gray-800 px-6 py-3 rounded-none font-light transition-all duration-300 hover:scale-105 w-full sm:w-auto"
                     onClick={() =>
                       window.open(
                         "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
@@ -655,7 +663,7 @@ export default function VentureCraftersLanding() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-gray-300 text-gray-600 hover:bg-gray-50 px-6 py-3 rounded-none font-light transition-all duration-300 hover:scale-105"
+                    className="border-gray-300 text-gray-600 hover:bg-gray-50 px-6 py-3 rounded-none font-light transition-all duration-300 hover:scale-105 w-full sm:w-auto"
                     onClick={() => {
                       window.open("https://chat.whatsapp.com/LliMQVE2glEESXvGD5mZ4h", "_blank")
                     }}
@@ -669,17 +677,19 @@ export default function VentureCraftersLanding() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-24 px-6 overflow-hidden">
+      {/* Testimonials Section - Mobile optimized */}
+      <section className="py-16 md:py-24 px-4 md:px-6 overflow-hidden">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">What Founders Say</h2>
-            <p className="text-lg text-gray-600 font-light">Voices from India and UAE</p>
+          <div className="text-center mb-12 md:mb-20">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extralight mb-4 md:mb-6 text-gray-900">
+              What Founders Say
+            </h2>
+            <p className="text-base md:text-lg text-gray-600 font-light">Voices from India and UAE</p>
           </div>
 
-          {/* Moving testimonials carousel */}
+          {/* Moving testimonials carousel - Mobile optimized */}
           <div className="relative">
-            <div className="flex animate-scroll space-x-8">
+            <div className="flex animate-scroll space-x-6 md:space-x-8">
               {[
                 {
                   quote:
@@ -784,19 +794,19 @@ export default function VentureCraftersLanding() {
                 .map((testimonial, index) => (
                   <Card
                     key={index}
-                    className="border-0 shadow-none bg-gray-50 hover:shadow-lg transition-all duration-300 hover:scale-105 hover:-translate-y-2 flex-shrink-0 w-80"
+                    className="border-0 shadow-none bg-gray-50 hover:shadow-lg transition-all duration-300 hover:scale-105 hover:-translate-y-2 flex-shrink-0 w-72 md:w-80"
                   >
-                    <CardContent className="p-8">
-                      <div className="flex items-center mb-4">
-                        <span className="text-2xl mr-2">{testimonial.flag}</span>
-                        <span className="text-sm text-gray-500 font-light">{testimonial.location}</span>
+                    <CardContent className="p-6 md:p-8">
+                      <div className="flex items-center mb-3 md:mb-4">
+                        <span className="text-xl md:text-2xl mr-2">{testimonial.flag}</span>
+                        <span className="text-xs md:text-sm text-gray-500 font-light">{testimonial.location}</span>
                       </div>
-                      <p className="text-lg text-gray-600 mb-6 font-light leading-relaxed italic">
+                      <p className="text-base md:text-lg text-gray-600 mb-4 md:mb-6 font-light leading-relaxed italic">
                         "{testimonial.quote}"
                       </p>
-                      <div className="border-t border-gray-100 pt-6">
-                        <p className="font-light text-gray-900">{testimonial.author}</p>
-                        <p className="text-sm text-gray-500 font-light">{testimonial.company}</p>
+                      <div className="border-t border-gray-100 pt-4 md:pt-6">
+                        <p className="font-light text-gray-900 text-sm md:text-base">{testimonial.author}</p>
+                        <p className="text-xs md:text-sm text-gray-500 font-light">{testimonial.company}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -806,48 +816,53 @@ export default function VentureCraftersLanding() {
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-24 px-6 bg-gray-50">
+      {/* Contact Section - Mobile optimized */}
+      <section id="contact" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
         <div className="container mx-auto max-w-4xl">
-          <div className="grid lg:grid-cols-2 gap-16">
-            <div className="space-y-8">
+          <div className="grid lg:grid-cols-2 gap-12 md:gap-16">
+            <div className="space-y-6 md:space-y-8">
               <div>
-                <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">Let's Talk</h2>
-                <p className="text-xl text-gray-600 leading-relaxed font-light">
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-extralight mb-4 md:mb-6 text-gray-900">
+                  Let's Talk
+                </h2>
+                <p className="text-lg md:text-xl text-gray-600 leading-relaxed font-light">
                   Ready to turn your startup vision into reality? We'd love to hear from you.
                 </p>
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4 group hover:scale-105 transition-transform duration-300">
+              <div className="space-y-4 md:space-y-6">
+                <div className="flex items-center space-x-3 md:space-x-4 group hover:scale-105 transition-transform duration-300">
                   <Phone
-                    className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors"
+                    className="h-4 w-4 md:h-5 md:w-5 text-gray-400 group-hover:text-gray-600 transition-colors"
                     strokeWidth={1}
                   />
-                  <span className="text-gray-600 font-light">+91 95996 91123</span>
+                  <span className="text-gray-600 font-light text-sm md:text-base">+91 95996 91123</span>
                 </div>
-                <div className="flex items-center space-x-4 group hover:scale-105 transition-transform duration-300">
-                  <Mail className="h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" strokeWidth={1} />
-                  <span className="text-gray-600 font-light">info@venturecrafters.in</span>
+                <div className="flex items-center space-x-3 md:space-x-4 group hover:scale-105 transition-transform duration-300">
+                  <Mail
+                    className="h-4 w-4 md:h-5 md:w-5 text-gray-400 group-hover:text-gray-600 transition-colors"
+                    strokeWidth={1}
+                  />
+                  <span className="text-gray-600 font-light text-sm md:text-base">info@venturecrafters.in</span>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-4 group hover:scale-105 transition-transform duration-300">
+                <div className="space-y-3 md:space-y-4">
+                  <div className="flex items-start space-x-3 md:space-x-4 group hover:scale-105 transition-transform duration-300">
                     <MapPin
-                      className="h-5 w-5 text-gray-400 mt-1 group-hover:text-gray-600 transition-colors"
+                      className="h-4 w-4 md:h-5 md:w-5 text-gray-400 mt-1 group-hover:text-gray-600 transition-colors"
                       strokeWidth={1}
                     />
-                    <div className="text-gray-600 font-light">
+                    <div className="text-gray-600 font-light text-sm md:text-base">
                       <p className="font-medium text-gray-700 mb-1">India Office</p>
                       <p>Forum, DLF Cyber City</p>
                       <p>Gurugram, Haryana 122002</p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-4 group hover:scale-105 transition-transform duration-300">
+                  <div className="flex items-start space-x-3 md:space-x-4 group hover:scale-105 transition-transform duration-300">
                     <MapPin
-                      className="h-5 w-5 text-gray-400 mt-1 group-hover:text-gray-600 transition-colors"
+                      className="h-4 w-4 md:h-5 md:w-5 text-gray-400 mt-1 group-hover:text-gray-600 transition-colors"
                       strokeWidth={1}
                     />
-                    <div className="text-gray-600 font-light">
+                    <div className="text-gray-600 font-light text-sm md:text-base">
                       <p className="font-medium text-gray-700 mb-1">UAE Office</p>
                       <p>Business Bay</p>
                       <p>Dubai, United Arab Emirates</p>
@@ -857,11 +872,11 @@ export default function VentureCraftersLanding() {
               </div>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8">
               <Card className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-300 hover:scale-105">
-                <CardContent className="p-8">
-                  <h3 className="text-xl font-light mb-4 text-gray-900">Start a Conversation</h3>
-                  <p className="text-gray-600 mb-6 font-light leading-relaxed">
+                <CardContent className="p-6 md:p-8">
+                  <h3 className="text-lg md:text-xl font-light mb-3 md:mb-4 text-gray-900">Start a Conversation</h3>
+                  <p className="text-gray-600 mb-4 md:mb-6 font-light leading-relaxed text-sm md:text-base">
                     Fill out our form and we'll get back to you within 24 hours with a personalized strategy session.
                   </p>
                   <Button
@@ -882,45 +897,45 @@ export default function VentureCraftersLanding() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-16 px-6 border-t border-gray-100">
+      {/* Footer - Mobile optimized */}
+      <footer className="py-12 md:py-16 px-4 md:px-6 border-t border-gray-100">
         <div className="container mx-auto max-w-4xl">
-          <div className="text-center space-y-8">
+          <div className="text-center space-y-6 md:space-y-8">
             <div className="flex justify-center">
               <img
                 src="/images/venturecrafters-text-logo.png"
                 alt="VentureCrafters Logo"
-                className="h-10 w-auto opacity-60 hover:opacity-100 transition-all duration-300 hover:scale-105"
+                className="h-8 md:h-10 w-auto opacity-60 hover:opacity-100 transition-all duration-300 hover:scale-105"
               />
             </div>
-            <p className="text-gray-500 font-light">Building the future, one startup at a time.</p>
-            <div className="flex justify-center space-x-8 text-sm">
+            <p className="text-gray-500 font-light text-sm md:text-base">Building the future, one startup at a time.</p>
+            <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-xs md:text-sm">
               <Link
                 href="/about"
-                className="text-gray-500 hover:text-gray-900 transition-all duration-300 hover:scale-105 font-light"
+                className="text-gray-500 hover:text-gray-900 transition-all duration-300 hover:scale-105 font-light py-2"
               >
                 About
               </Link>
-              <a
-                href="#services"
-                className="text-gray-500 hover:text-gray-900 transition-all duration-300 hover:scale-105 font-light"
+              <Link
+                href="/services"
+                className="text-gray-500 hover:text-gray-900 transition-all duration-300 hover:scale-105 font-light py-2"
               >
                 Services
-              </a>
+              </Link>
               <Link
                 href="/portfolio"
-                className="text-gray-500 hover:text-gray-900 transition-all duration-300 hover:scale-105 font-light"
+                className="text-gray-500 hover:text-gray-900 transition-all duration-300 hover:scale-105 font-light py-2"
               >
                 Portfolio
               </Link>
               <a
                 href="#contact"
-                className="text-gray-500 hover:text-gray-900 transition-all duration-300 hover:scale-105 font-light"
+                className="text-gray-500 hover:text-gray-900 transition-all duration-300 hover:scale-105 font-light py-2"
               >
                 Contact
               </a>
             </div>
-            <div className="pt-8 border-t border-gray-100 text-gray-400 text-sm font-light">
+            <div className="pt-6 md:pt-8 border-t border-gray-100 text-gray-400 text-xs md:text-sm font-light">
               <p>&copy; 2024 VentureCrafters. All rights reserved.</p>
             </div>
           </div>
