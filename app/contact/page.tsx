@@ -23,426 +23,584 @@ import {
   Instagram,
   Twitter,
   Youtube,
+  Menu,
+  X,
+  ChevronDown,
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 export default function ContactPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+  const [activeSection, setActiveSection] = useState("hero")
+  const [isVisible, setIsVisible] = useState({})
+
+  const heroRef = useRef(null)
+  const contactRef = useRef(null)
+  const socialRef = useRef(null)
 
   useEffect(() => {
     setIsLoaded(true)
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
+    const handleScroll = () => setScrollY(window.scrollY)
+
     window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
+    window.addEventListener("scroll", handleScroll)
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("scroll", handleScroll)
+    }
   }, [])
 
+  // Intersection Observer for animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible((prev) => ({ ...prev, [entry.target.id]: true }))
+            setActiveSection(entry.target.id)
+          }
+        })
+      },
+      { threshold: 0.3 },
+    )
+
+    const sections = [heroRef, contactRef, socialRef]
+    sections.forEach((ref) => {
+      if (ref.current) observer.observe(ref.current)
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  const parallaxOffset = scrollY * 0.3
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white overflow-x-hidden relative">
-      {/* Custom Cursor */}
+    <div className="min-h-screen bg-white text-gray-900 font-light overflow-x-hidden">
+      {/* Custom cursor */}
       <div
-        className="fixed w-6 h-6 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full pointer-events-none z-50 mix-blend-difference transition-transform duration-150 ease-out hidden md:block"
+        className="fixed w-4 h-4 bg-gray-900 rounded-full pointer-events-none z-50 mix-blend-difference transition-transform duration-200 ease-out hidden md:block"
         style={{
-          left: mousePosition.x - 12,
-          top: mousePosition.y - 12,
+          left: mousePosition.x - 8,
+          top: mousePosition.y - 8,
           transform: `scale(${isLoaded ? 1 : 0})`,
         }}
       />
 
-      {/* Animated Background */}
-      <div className="fixed inset-0 opacity-10">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
-            `,
-            backgroundSize: "60px 60px",
-            animation: "grid-float 20s ease-in-out infinite",
-          }}
-        />
-      </div>
-
-      {/* Floating Orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full blur-3xl animate-pulse delay-2000" />
+      {/* Floating navigation dots */}
+      <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
+        <div className="space-y-4">
+          {[
+            { id: "hero", label: "Connect" },
+            { id: "contact", label: "Contact" },
+            { id: "social", label: "Social" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })
+              }}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                activeSection === item.id ? "bg-gray-900 scale-125" : "bg-gray-300 hover:bg-gray-600"
+              }`}
+              title={item.label}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Logo */}
-      <div className="absolute top-6 left-6 z-40">
+      <div className="fixed top-6 left-6 z-50">
         <Link href="/" className="group">
           <img
             src="/images/venturecrafters-latest-logo.png"
             alt="VentureCrafters"
-            className="h-10 w-auto hover:scale-110 transition-transform duration-300"
+            className={`h-8 w-auto transition-all duration-500 ${
+              scrollY > 100 ? "opacity-60 scale-90" : "opacity-100 scale-100"
+            } hover:opacity-100 hover:scale-100`}
           />
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-40 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-full px-8 py-4 shadow-2xl">
-        <div className="flex items-center space-x-8">
-          <div className="hidden md:flex space-x-6 text-sm font-medium">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors relative group">
-              Home
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/about" className="text-gray-300 hover:text-white transition-colors relative group">
-              About
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/services" className="text-gray-300 hover:text-white transition-colors relative group">
-              Services
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/portfolio" className="text-gray-300 hover:text-white transition-colors relative group">
-              Portfolio
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/contact" className="text-cyan-400 font-semibold relative">
-              Contact
-              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400" />
-            </Link>
+      {/* Mobile Menu Button */}
+      <div className="fixed top-6 right-6 z-50 md:hidden">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+        >
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`fixed inset-0 z-40 bg-white md:hidden transition-transform duration-500 ease-in-out ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col items-center justify-center h-full space-y-8 text-center">
+          {["Home", "About", "Services", "Portfolio", "Contact"].map((item, index) => (
+            <div
+              key={item}
+              className={`transition-all duration-500 delay-${index * 100} ${
+                mobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`}
+            >
+              <Link
+                href={item === "Home" ? "/" : item === "Contact" ? "/contact" : `/${item.toLowerCase()}`}
+                className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Navigation */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 hidden md:block ${
+          scrollY > 50 ? "bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm" : "bg-transparent"
+        }`}
+      >
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-12">
+              <div className="w-8"></div>
+              <div className="flex space-x-8 text-sm font-light">
+                <Link href="/" className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group">
+                  Home
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/about"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  About
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/services"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  Services
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/portfolio"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  Portfolio
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link href="/contact" className="text-gray-900 font-medium transition-all duration-300 relative group">
+                  Contact
+                  <span className="absolute -bottom-1 left-0 w-full h-px bg-gray-900" />
+                </Link>
+              </div>
+            </div>
+            <Button
+              className="bg-gray-900 text-white hover:bg-gray-800 px-6 py-2 rounded-none font-light text-sm transition-all duration-300 hover:scale-105"
+              onClick={() =>
+                window.open(
+                  "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
+                  "_blank",
+                )
+              }
+            >
+              Let's Work Together
+            </Button>
           </div>
-          <Button
-            className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 border-0 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            onClick={() =>
-              window.open(
-                "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
-                "_blank",
-              )
-            }
-          >
-            Let's Build
-            <Rocket className="ml-2 h-4 w-4" />
-          </Button>
         </div>
       </nav>
 
-      {/* Hero Section - Mobile Optimized */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-20 px-4 relative">
-        <div className="container mx-auto">
-          <div className="max-w-6xl mx-auto text-center space-y-8 md:space-y-12">
-            <div className="space-y-6 md:space-y-8">
-              <Badge className="bg-gradient-to-r from-pink-500/20 to-orange-500/20 text-pink-300 border-pink-500/30 text-base md:text-lg px-4 md:px-6 py-2 md:py-3 rounded-full">
-                <Coffee className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                Let's Connect
-              </Badge>
+      {/* Hero Section */}
+      <section
+        id="hero"
+        ref={heroRef}
+        className="min-h-screen flex items-center pt-20 pb-16 px-6 relative overflow-hidden"
+      >
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-5" style={{ transform: `translateY(${parallaxOffset}px)` }}>
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gray-900 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-gray-600 rounded-full blur-2xl" />
+        </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black leading-tight">
-                <span className="block text-white">Ready to</span>
-                <span className="block bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Transform
-                </span>
-                <span className="block text-white">Your Startup?</span>
-              </h1>
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="text-center space-y-12">
+            <div className="space-y-8">
+              <div
+                className={`inline-block transition-all duration-1000 delay-300 ${
+                  isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+              >
+                <Badge variant="outline" className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light">
+                  <Coffee className="w-4 h-4 mr-2" />
+                  Let's Connect
+                </Badge>
+              </div>
 
-              <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 text-lg md:text-xl text-gray-300">
-                <p className="leading-relaxed">
+              <div
+                className={`space-y-6 transition-all duration-1000 delay-500 ${
+                  isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+              >
+                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight leading-tight tracking-tight">
+                  <span className="block text-gray-900">Ready to</span>
+                  <span className="block text-gray-400 italic">Transform</span>
+                  <span className="block text-gray-900">Your Startup?</span>
+                </h1>
+
+                <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-light">
                   Let's grab a coffee (virtual or real) and discuss how we can turn your startup dreams into reality.
-                </p>
-                <p className="text-base md:text-lg text-gray-400">
-                  We're here to listen, understand your vision, and craft the perfect execution strategy for your
-                  business.
+                  <br />
+                  <span className="text-gray-500">
+                    We're here to listen, understand your vision, and craft the perfect execution strategy for your
+                    business.
+                  </span>
                 </p>
               </div>
             </div>
 
-            {/* Quick Stats - Mobile Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+            {/* Quick Stats */}
+            <div
+              className={`grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto transition-all duration-1000 delay-700 ${
+                isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+            >
               {[
-                { number: "24hrs", label: "Response Time", icon: Clock, color: "cyan" },
-                { number: "100+", label: "Startups Helped", icon: Users, color: "purple" },
-                { number: "$600K+", label: "Funds Raised", icon: Star, color: "pink" },
-                { number: "Global", label: "Reach", icon: Globe, color: "orange" },
+                { number: "24hrs", label: "Response Time", icon: Clock },
+                { number: "100+", label: "Startups Helped", icon: Users },
+                { number: "$600K+", label: "Funds Raised", icon: Star },
+                { number: "Global", label: "Reach", icon: Globe },
               ].map((stat, index) => (
                 <Card
                   key={index}
-                  className="group bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105"
+                  className={`border-0 shadow-none bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-500 group cursor-default transform hover:scale-105 ${
+                    isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                  }`}
+                  style={{ transitionDelay: `${800 + index * 100}ms` }}
                 >
-                  <CardContent className="p-4 md:p-6 text-center">
-                    <div
-                      className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-4 bg-gradient-to-br ${
-                        stat.color === "cyan"
-                          ? "from-cyan-500/20 to-cyan-600/20 border border-cyan-500/30"
-                          : stat.color === "purple"
-                            ? "from-purple-500/20 to-purple-600/20 border border-purple-500/30"
-                            : stat.color === "pink"
-                              ? "from-pink-500/20 to-pink-600/20 border border-pink-500/30"
-                              : "from-orange-500/20 to-orange-600/20 border border-orange-500/30"
-                      } group-hover:scale-110 transition-transform`}
-                    >
-                      <stat.icon
-                        className={`h-5 w-5 md:h-6 md:w-6 ${
-                          stat.color === "cyan"
-                            ? "text-cyan-400"
-                            : stat.color === "purple"
-                              ? "text-purple-400"
-                              : stat.color === "pink"
-                                ? "text-pink-400"
-                                : "text-orange-400"
-                        }`}
-                      />
+                  <CardContent className="p-6 text-center">
+                    <div className="w-8 h-8 mx-auto mb-3 text-gray-400 group-hover:text-gray-600 transition-colors">
+                      <stat.icon className="w-full h-full" strokeWidth={1} />
                     </div>
-                    <div className="text-xl md:text-2xl font-black text-white mb-2">{stat.number}</div>
-                    <p className="text-xs md:text-sm text-gray-400">{stat.label}</p>
+                    <div className="text-2xl font-light text-gray-900 mb-2">{stat.number}</div>
+                    <p className="text-sm text-gray-500 font-light">{stat.label}</p>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+
+            {/* Scroll indicator */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+              <ChevronDown className="h-6 w-6 text-gray-400" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Contact Methods Section */}
-      <section className="py-32 px-4 relative">
-        <div className="container mx-auto">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-6xl font-black mb-8">
-                <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Get In Touch
-                </span>
-              </h2>
-              <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-                Choose your preferred way to connect with us. We're always excited to hear from ambitious founders.
-              </p>
-            </div>
+      <section id="contact" ref={contactRef} className="py-24 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-6xl">
+          <div
+            className={`text-center mb-20 transition-all duration-1000 ${
+              isVisible.contact ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">Get In Touch</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+              Choose your preferred way to connect with us. We're always excited to hear from ambitious founders.
+            </p>
+          </div>
 
-            <div className="grid lg:grid-cols-3 gap-8 mb-16">
-              {/* Primary Contact */}
-              <Card className="lg:col-span-2 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 backdrop-blur-xl border border-cyan-500/30 hover:border-cyan-400/50 transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center mr-4">
-                      <MessageCircle className="h-6 w-6 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white">Start the Conversation</h3>
+          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+            {/* Primary Contact */}
+            <Card
+              className={`lg:col-span-2 border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500 ${
+                isVisible.contact ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+            >
+              <CardContent className="p-8">
+                <div className="flex items-center mb-6">
+                  <div className="w-8 h-8 text-gray-400 mr-4">
+                    <MessageCircle className="w-full h-full" strokeWidth={1} />
                   </div>
-                  <p className="text-gray-300 mb-6 leading-relaxed">
-                    Ready to build something extraordinary? Fill out our quick form and we'll get back to you within 24
-                    hours with a personalized strategy session.
-                  </p>
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-lg px-8 py-4 rounded-2xl shadow-2xl hover:scale-105 transition-all duration-300"
-                    onClick={() =>
-                      window.open(
-                        "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
-                        "_blank",
-                      )
-                    }
-                  >
-                    Start Your Journey
-                    <Send className="ml-2 h-5 w-5" />
-                  </Button>
+                  <h3 className="text-xl font-light text-gray-900">Start the Conversation</h3>
+                </div>
+                <p className="text-gray-600 mb-6 leading-relaxed font-light">
+                  Ready to build something extraordinary? Fill out our quick form and we'll get back to you within 24
+                  hours with a personalized strategy session.
+                </p>
+                <Button
+                  size="lg"
+                  className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-4 rounded-none font-light shadow-lg hover:scale-105 transition-all duration-300 group"
+                  onClick={() =>
+                    window.open(
+                      "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
+                      "_blank",
+                    )
+                  }
+                >
+                  Start Your Journey
+                  <Send className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" strokeWidth={1} />
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Quick Contact */}
+            <Card
+              className={`border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500 delay-200 ${
+                isVisible.contact ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+            >
+              <CardContent className="p-8">
+                <div className="flex items-center mb-6">
+                  <div className="w-8 h-8 text-gray-400 mr-4">
+                    <Calendar className="w-full h-full" strokeWidth={1} />
+                  </div>
+                  <h3 className="text-xl font-light text-gray-900">Book a Call</h3>
+                </div>
+                <p className="text-gray-600 mb-6 leading-relaxed font-light">
+                  Prefer to talk directly? Schedule a 30-minute discovery call to discuss your startup and explore how
+                  we can help.
+                </p>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-gray-300 text-gray-600 hover:bg-gray-50 px-8 py-4 rounded-none font-light hover:scale-105 transition-all duration-300 group w-full"
+                >
+                  Schedule Call
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" strokeWidth={1} />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contact Information */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Phone,
+                title: "Call Us",
+                primary: "+91 95996 91123",
+                secondary: "Available 9 AM - 7 PM IST",
+                action: () => window.open("tel:+919599691123"),
+              },
+              {
+                icon: Mail,
+                title: "Email Us",
+                primary: "info@venturecrafters.in",
+                secondary: "We respond within 24 hours",
+                action: () => window.open("mailto:info@venturecrafters.in"),
+              },
+              {
+                icon: MapPin,
+                title: "Visit Us",
+                primary: "Bangalore, India",
+                secondary: "Available for in-person meetings",
+                action: () => {},
+              },
+            ].map((contact, index) => (
+              <Card
+                key={index}
+                className={`border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500 group cursor-pointer transform hover:scale-105 ${
+                  isVisible.contact ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+                style={{ transitionDelay: `${400 + index * 100}ms` }}
+                onClick={contact.action}
+              >
+                <CardContent className="p-8 text-center">
+                  <div className="w-10 h-10 mx-auto mb-6 text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <contact.icon className="w-full h-full" strokeWidth={1} />
+                  </div>
+                  <h4 className="text-lg font-light text-gray-900 mb-3">{contact.title}</h4>
+                  <p className="text-gray-900 font-normal mb-2">{contact.primary}</p>
+                  <p className="text-sm text-gray-500 font-light">{contact.secondary}</p>
                 </CardContent>
               </Card>
-
-              {/* Quick Contact */}
-              <Card className="bg-gradient-to-br from-pink-500/10 to-orange-500/10 backdrop-blur-xl border border-pink-500/30 hover:border-pink-400/50 transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-orange-500 rounded-2xl flex items-center justify-center mr-4">
-                      <Calendar className="h-6 w-6 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white">Book a Call</h3>
-                  </div>
-                  <p className="text-gray-300 mb-6 text-sm leading-relaxed">
-                    Prefer to talk directly? Schedule a 30-minute discovery call to discuss your startup vision.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="border-2 border-pink-400 text-pink-400 hover:bg-pink-400 hover:text-white w-full rounded-xl transition-all duration-300"
-                  >
-                    Schedule Call
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Direct Contact Info */}
-            <div className="grid md:grid-cols-2 gap-8 mb-16">
-              <Card className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <Phone className="h-6 w-6 text-cyan-400 mr-3" />
-                    <h3 className="text-xl font-semibold text-white">Call Us</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10">
-                      <div className="text-2xl">🇮🇳</div>
-                      <div>
-                        <p className="text-white font-semibold">+91 95996 91123</p>
-                        <p className="text-gray-400 text-sm">India Office</p>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Clock className="h-4 w-4" />
-                        <span>Mon-Fri: 9:00 AM - 7:00 PM IST</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4" />
-                        <span>Sat: 10:00 AM - 4:00 PM IST</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <Mail className="h-6 w-6 text-purple-400 mr-3" />
-                    <h3 className="text-xl font-semibold text-white">Email Us</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10">
-                      <Mail className="h-5 w-5 text-purple-400" />
-                      <div>
-                        <p className="text-white font-semibold">info@venturecrafters.in</p>
-                        <p className="text-gray-400 text-sm">General Inquiries</p>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <CheckCircle className="h-4 w-4 text-green-400" />
-                        <span>24-hour response guarantee</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4 text-green-400" />
-                        <span>Detailed project discussions</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Social Media & Online Presence */}
-            <div className="text-center mb-16">
-              <h3 className="text-3xl font-bold text-white mb-8">Connect With Us Online</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                {[
-                  {
-                    name: "LinkedIn",
-                    icon: Linkedin,
-                    color: "from-blue-500 to-blue-600",
-                    url: "https://linkedin.com/company/venturecrafters",
-                    description: "Professional updates & insights",
-                  },
-                  {
-                    name: "Instagram",
-                    icon: Instagram,
-                    color: "from-pink-500 to-purple-600",
-                    url: "https://instagram.com/venturecrafters",
-                    description: "Behind the scenes content",
-                  },
-                  {
-                    name: "Twitter",
-                    icon: Twitter,
-                    color: "from-cyan-400 to-blue-500",
-                    url: "https://twitter.com/venturecrafters",
-                    description: "Real-time updates & thoughts",
-                  },
-                  {
-                    name: "YouTube",
-                    icon: Youtube,
-                    color: "from-red-500 to-red-600",
-                    url: "https://youtu.be/0wrCxUtWM7E",
-                    description: "Our story & case studies",
-                  },
-                ].map((social, index) => (
-                  <Card
-                    key={index}
-                    className="group bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 cursor-pointer"
-                    onClick={() => window.open(social.url, "_blank")}
-                  >
-                    <CardContent className="p-6 text-center">
-                      <div
-                        className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-r ${social.color} group-hover:scale-110 transition-transform`}
-                      >
-                        <social.icon className="h-6 w-6 text-white" />
-                      </div>
-                      <h4 className="text-white font-semibold mb-2">{social.name}</h4>
-                      <p className="text-gray-400 text-xs">{social.description}</p>
-                      <ExternalLink className="h-4 w-4 text-gray-500 mx-auto mt-2 group-hover:text-white transition-colors" />
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Office Locations */}
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 backdrop-blur-xl border border-cyan-500/30 hover:border-cyan-400/50 transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <MapPin className="h-6 w-6 text-cyan-400 mr-3" />
-                    <h3 className="text-xl font-semibold text-white">🇮🇳 India Office</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="text-gray-300">
-                      <p className="font-semibold">Forum, DLF Cyber City</p>
-                      <p>DLF Phase 3, Sector 24</p>
-                      <p>Gurugram, Haryana 122002</p>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-400">
-                      <Clock className="h-4 w-4" />
-                      <span>IST: Mon-Fri 9AM-7PM</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 backdrop-blur-xl border border-purple-500/30 hover:border-purple-400/50 transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <MapPin className="h-6 w-6 text-purple-400 mr-3" />
-                    <h3 className="text-xl font-semibold text-white">🇦🇪 UAE Office</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="text-gray-300">
-                      <p className="font-semibold">in5 Tech, Dubai Knowledge Park</p>
-                      <p>PO Box 73000</p>
-                      <p>Dubai, UAE</p>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-400">
-                      <Clock className="h-4 w-4" />
-                      <span>GST: Sun-Thu 9AM-6PM</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-32 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600 opacity-90" />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="container mx-auto relative z-10 text-center">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <h2 className="text-5xl md:text-6xl font-black text-white">What Are You Waiting For?</h2>
-            <p className="text-xl text-white/90 leading-relaxed">
-              Every day you wait is a day your competitors get ahead. Let's start building your success story today.
+      {/* Social & Community Section */}
+      <section id="social" ref={socialRef} className="py-24 px-6">
+        <div className="container mx-auto max-w-6xl">
+          <div
+            className={`text-center mb-20 transition-all duration-1000 ${
+              isVisible.social ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">Follow Our Journey</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
+              Stay updated with our latest insights, success stories, and startup wisdom across our social channels.
             </p>
-            <div className="text-3xl font-bold text-white mb-8">☕ Coffee's on us!</div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            {[
+              {
+                platform: "LinkedIn",
+                handle: "@venturecrafters",
+                description: "Professional insights & startup stories",
+                icon: Linkedin,
+                color: "hover:text-blue-600",
+                followers: "5K+",
+              },
+              {
+                platform: "Instagram",
+                handle: "@venturecrafters.in",
+                description: "Behind-the-scenes & founder life",
+                icon: Instagram,
+                color: "hover:text-pink-600",
+                followers: "3K+",
+              },
+              {
+                platform: "Twitter",
+                handle: "@venturecrafters",
+                description: "Real-time thoughts & industry news",
+                icon: Twitter,
+                color: "hover:text-blue-400",
+                followers: "2K+",
+              },
+              {
+                platform: "YouTube",
+                handle: "VentureCrafters",
+                description: "Startup tutorials & case studies",
+                icon: Youtube,
+                color: "hover:text-red-600",
+                followers: "1K+",
+              },
+            ].map((social, index) => (
+              <Card
+                key={index}
+                className={`border-0 shadow-none bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-500 group cursor-pointer transform hover:scale-105 ${
+                  isVisible.social ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <CardContent className="p-8 text-center">
+                  <div
+                    className={`w-10 h-10 mx-auto mb-6 text-gray-400 transition-colors ${social.color} group-hover:scale-110 transition-transform`}
+                  >
+                    <social.icon className="w-full h-full" strokeWidth={1} />
+                  </div>
+                  <h4 className="text-lg font-light text-gray-900 mb-2">{social.platform}</h4>
+                  <p className="text-gray-600 font-normal mb-2">{social.handle}</p>
+                  <p className="text-sm text-gray-500 font-light mb-3">{social.description}</p>
+                  <Badge variant="outline" className="border-gray-200 text-gray-500 text-xs font-light">
+                    {social.followers} followers
+                  </Badge>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div
+            className={`text-center transition-all duration-1000 delay-500 ${
+              isVisible.social ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <Card className="max-w-2xl mx-auto border-0 shadow-none bg-gray-50 hover:shadow-lg transition-all duration-500">
+              <CardContent className="p-8">
+                <Rocket className="h-8 w-8 text-gray-400 mx-auto mb-4" strokeWidth={1} />
+                <h3 className="text-xl font-light text-gray-900 mb-4">Join Our Community</h3>
+                <p className="text-gray-600 leading-relaxed mb-6 font-light">
+                  Connect with like-minded founders, share experiences, and get exclusive insights from our team and
+                  portfolio companies.
+                </p>
+                <div className="flex justify-center space-x-4">
+                  <Button
+                    variant="outline"
+                    className="border-gray-300 text-gray-600 hover:bg-gray-50 rounded-none font-light"
+                  >
+                    <ExternalLink className="mr-2 h-4 w-4" strokeWidth={1} />
+                    Join Community
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">Quick Questions?</h2>
+            <p className="text-xl text-gray-600 font-light">Here are some answers to get you started.</p>
+          </div>
+
+          <div className="space-y-6">
+            {[
+              {
+                question: "How quickly can we start working together?",
+                answer:
+                  "We can typically start within 48 hours of our initial conversation. We believe in moving fast when founders are ready to execute.",
+              },
+              {
+                question: "What's your typical engagement model?",
+                answer:
+                  "We work as your fractional co-founder, typically 3-6 month engagements with clear milestones and deliverables. Every engagement is customized to your specific needs.",
+              },
+              {
+                question: "Do you take equity or work on retainer?",
+                answer:
+                  "We offer both models depending on the stage and needs of your startup. We're flexible and founder-friendly in our approach.",
+              },
+              {
+                question: "What if we're not ready for funding yet?",
+                answer:
+                  "Perfect! We love working with early-stage founders. We'll help you build the foundation needed to become investor-ready when the time is right.",
+              },
+            ].map((faq, index) => (
+              <Card
+                key={index}
+                className="border-0 shadow-none bg-white hover:shadow-md transition-all duration-300 group"
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-6 h-6 text-gray-400 mt-1 flex-shrink-0">
+                      <CheckCircle className="w-full h-full" strokeWidth={1} />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-light text-gray-900 mb-2">{faq.question}</h4>
+                      <p className="text-gray-600 leading-relaxed font-light">{faq.answer}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 px-6">
+        <div className="container mx-auto max-w-4xl text-center">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">Let's Build Something Amazing</h2>
+            <p className="text-xl text-gray-600 leading-relaxed font-light">
+              Your startup journey starts with a single conversation. Let's make it count.
+            </p>
+            <div className="text-2xl font-light text-gray-900 mb-8">☕ Coffee's on us!</div>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button
                 size="lg"
-                className="bg-white text-gray-900 hover:bg-gray-100 text-xl px-16 py-8 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-all duration-300"
+                className="bg-gray-900 text-white hover:bg-gray-800 px-12 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 group"
                 onClick={() =>
                   window.open(
                     "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
@@ -450,72 +608,63 @@ export default function ContactPage() {
                   )
                 }
               >
-                Let's Build Together
-                <Rocket className="ml-3 h-6 w-6" />
+                Start the Conversation
+                <Coffee className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={1} />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-xl px-16 py-8 rounded-2xl font-bold transition-all duration-300 hover:scale-105"
+                className="border-gray-300 text-gray-600 hover:bg-gray-50 px-12 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 group"
+                onClick={() => window.open("tel:+919599691123")}
               >
-                Schedule Discovery Call
-                <Calendar className="ml-3 h-6 w-6" />
+                Call Now
+                <Phone className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={1} />
               </Button>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 pt-8 text-white/80">
-              <div className="flex items-center space-x-2">
-                <Phone className="h-5 w-5" />
-                <span>+91 95996 91123</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Mail className="h-5 w-5" />
-                <span>info@venturecrafters.in</span>
-              </div>
+            <div className="pt-8 text-gray-500 font-light">
+              <p>Available Monday - Friday, 9 AM - 7 PM IST</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-black/50 backdrop-blur-xl py-16 border-t border-white/10 px-4">
-        <div className="container mx-auto">
+      <footer className="py-16 px-6 border-t border-gray-100">
+        <div className="container mx-auto max-w-4xl">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
-              <img src="/images/venturecrafters-latest-logo.png" alt="VentureCrafters Logo" className="h-12 w-auto" />
+              <img
+                src="/images/venturecrafters-latest-logo.png"
+                alt="VentureCrafters Logo"
+                className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity duration-300"
+              />
             </div>
-            <p className="text-gray-400 text-lg">Building the future, one startup at a time.</p>
-            <div className="flex justify-center space-x-8">
-              <Link href="/" className="text-gray-400 hover:text-cyan-400 transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-gray-400 hover:text-purple-400 transition-colors">
-                About
-              </Link>
-              <Link href="/services" className="text-gray-400 hover:text-pink-400 transition-colors">
-                Services
-              </Link>
-              <Link href="/portfolio" className="text-gray-400 hover:text-purple-400 transition-colors">
-                Portfolio
-              </Link>
-              <Link href="/contact" className="text-cyan-400 font-semibold">
-                Contact
-              </Link>
+            <p className="text-gray-500 font-light">Building the future, one startup at a time.</p>
+            <div className="flex justify-center space-x-8 text-sm">
+              {["Home", "About", "Services", "Portfolio", "Contact"].map((item) => (
+                <Link
+                  key={item}
+                  href={item === "Home" ? "/" : item === "Contact" ? "/contact" : `/${item.toLowerCase()}`}
+                  className={`font-light transition-all duration-300 relative group ${
+                    item === "Contact" ? "text-gray-900" : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  {item}
+                  <span
+                    className={`absolute -bottom-1 left-0 h-px bg-gray-900 transition-all duration-300 ${
+                      item === "Contact" ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
+                </Link>
+              ))}
             </div>
-            <div className="pt-8 border-t border-white/10 text-gray-500">
+            <div className="pt-8 border-t border-gray-100 text-gray-400 text-sm font-light">
               <p>&copy; 2024 VentureCrafters. All rights reserved.</p>
             </div>
           </div>
         </div>
       </footer>
-
-      <style jsx>{`
-        @keyframes grid-float {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          33% { transform: translate(30px, -30px) rotate(1deg); }
-          66% { transform: translate(-20px, 20px) rotate(-1deg); }
-        }
-      `}</style>
     </div>
   )
 }

@@ -19,543 +19,617 @@ import {
   CheckCircle,
   Coffee,
   Award,
-  Sparkles,
   ArrowRight,
   Quote,
+  Menu,
+  ChevronDown,
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 export default function AboutPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+  const [activeSection, setActiveSection] = useState("hero")
+  const [isVisible, setIsVisible] = useState({})
+
+  const heroRef = useRef(null)
+  const problemRef = useRef(null)
+  const journeyRef = useRef(null)
+  const validationRef = useRef(null)
 
   useEffect(() => {
     setIsLoaded(true)
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
+    const handleScroll = () => setScrollY(window.scrollY)
+
     window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
+    window.addEventListener("scroll", handleScroll)
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("scroll", handleScroll)
+    }
   }, [])
 
+  // Intersection Observer for animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible((prev) => ({ ...prev, [entry.target.id]: true }))
+            setActiveSection(entry.target.id)
+          }
+        })
+      },
+      { threshold: 0.3 },
+    )
+
+    const sections = [heroRef, problemRef, journeyRef, validationRef]
+    sections.forEach((ref) => {
+      if (ref.current) observer.observe(ref.current)
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  const parallaxOffset = scrollY * 0.3
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white overflow-x-hidden relative">
-      {/* Custom Cursor */}
+    <div className="min-h-screen bg-white text-gray-900 font-light overflow-x-hidden">
+      {/* Custom cursor */}
       <div
-        className="fixed w-6 h-6 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full pointer-events-none z-50 mix-blend-difference transition-transform duration-150 ease-out"
+        className="fixed w-4 h-4 bg-gray-900 rounded-full pointer-events-none z-50 mix-blend-difference transition-transform duration-200 ease-out hidden md:block"
         style={{
-          left: mousePosition.x - 12,
-          top: mousePosition.y - 12,
+          left: mousePosition.x - 8,
+          top: mousePosition.y - 8,
           transform: `scale(${isLoaded ? 1 : 0})`,
         }}
       />
 
-      {/* Animated Background */}
-      <div className="fixed inset-0 opacity-10">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
-            `,
-            backgroundSize: "60px 60px",
-            animation: "grid-float 20s ease-in-out infinite",
-          }}
-        />
-      </div>
-
-      {/* Floating Orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full blur-3xl animate-pulse delay-2000" />
+      {/* Floating navigation dots */}
+      <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
+        <div className="space-y-4">
+          {[
+            { id: "hero", label: "Story" },
+            { id: "problem", label: "Problem" },
+            { id: "journey", label: "Journey" },
+            { id: "validation", label: "Validation" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })
+              }}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                activeSection === item.id ? "bg-gray-900 scale-125" : "bg-gray-300 hover:bg-gray-600"
+              }`}
+              title={item.label}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Logo */}
-      <div className="absolute top-6 left-6 z-40">
+      <div className="fixed top-6 left-6 z-50">
         <Link href="/" className="group">
           <img
             src="/images/venturecrafters-latest-logo.png"
             alt="VentureCrafters"
-            className="h-10 w-auto hover:scale-110 transition-transform duration-300"
+            className={`h-8 w-auto transition-all duration-500 ${
+              scrollY > 100 ? "opacity-60 scale-90" : "opacity-100 scale-100"
+            } hover:opacity-100 hover:scale-100`}
           />
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-40 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-full px-8 py-4 shadow-2xl">
-        <div className="flex items-center space-x-8">
-          <div className="hidden md:flex space-x-6 text-sm font-medium">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors relative group">
-              Home
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/about" className="text-cyan-400 font-semibold relative">
-              About
-              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400" />
-            </Link>
-            <Link href="/services" className="text-gray-300 hover:text-white transition-colors relative group">
-              Services
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/portfolio" className="text-gray-300 hover:text-white transition-colors relative group">
-              Portfolio
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/contact" className="text-gray-300 hover:text-white transition-colors relative group">
-              Contact
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
+      {/* Mobile Menu Button */}
+      <div className="fixed top-6 right-6 z-50 md:hidden">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+        >
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`fixed inset-0 z-40 bg-white md:hidden transition-transform duration-500 ease-in-out ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col items-center justify-center h-full space-y-8 text-center">
+          {["Home", "About", "Services", "Portfolio", "Contact"].map((item, index) => (
+            <div
+              key={item}
+              className={`transition-all duration-500 delay-${index * 100} ${
+                mobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`}
+            >
+              <Link
+                href={item === "Home" ? "/" : item === "About" ? "/about" : `/${item.toLowerCase()}`}
+                className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Navigation */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 hidden md:block ${
+          scrollY > 50 ? "bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm" : "bg-transparent"
+        }`}
+      >
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-12">
+              <div className="w-8"></div>
+              <div className="flex space-x-8 text-sm font-light">
+                <Link href="/" className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group">
+                  Home
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link href="/about" className="text-gray-900 font-medium transition-all duration-300 relative group">
+                  About
+                  <span className="absolute -bottom-1 left-0 w-full h-px bg-gray-900" />
+                </Link>
+                <Link
+                  href="/services"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  Services
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/portfolio"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  Portfolio
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/contact"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  Contact
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+              </div>
+            </div>
+            <Button
+              className="bg-gray-900 text-white hover:bg-gray-800 px-6 py-2 rounded-none font-light text-sm transition-all duration-300 hover:scale-105"
+              onClick={() =>
+                window.open(
+                  "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
+                  "_blank",
+                )
+              }
+            >
+              Let's Work Together
+            </Button>
           </div>
-          <Button className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 border-0 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-            Let's Build
-            <Rocket className="ml-2 h-4 w-4" />
-          </Button>
         </div>
       </nav>
 
-      {/* Hero Section - Mobile Optimized */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-20 relative">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto text-center space-y-8 md:space-y-12">
-            <div className="space-y-6 md:space-y-8">
-              <Badge className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-300 border-cyan-500/30 text-base md:text-lg px-4 md:px-6 py-2 md:py-3 rounded-full">
-                <Heart className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                Our Story
-              </Badge>
+      {/* Hero Section */}
+      <section
+        id="hero"
+        ref={heroRef}
+        className="min-h-screen flex items-center pt-20 pb-16 px-6 relative overflow-hidden"
+      >
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-5" style={{ transform: `translateY(${parallaxOffset}px)` }}>
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gray-900 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-gray-600 rounded-full blur-2xl" />
+        </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black leading-tight">
-                <span className="block text-white">We're the</span>
-                <span className="block bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent animate-pulse">
-                  90%
-                </span>
-                <span className="block text-white">who refused</span>
-                <span className="block bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  to quit
-                </span>
-              </h1>
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="text-center space-y-12">
+            <div className="space-y-8">
+              <div
+                className={`inline-block transition-all duration-1000 delay-300 ${
+                  isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+              >
+                <Badge variant="outline" className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light">
+                  <Heart className="w-4 h-4 mr-2" />
+                  Our Story
+                </Badge>
+              </div>
 
-              <p className="text-lg md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                We've been where you are. We've felt the pain, the rejection, the sleepless nights.
-                <span className="text-cyan-400 font-semibold"> But we didn't give up.</span>
-              </p>
+              <div
+                className={`space-y-6 transition-all duration-1000 delay-500 ${
+                  isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+              >
+                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight leading-tight tracking-tight">
+                  <span className="block text-gray-900">We're the</span>
+                  <span className="block text-gray-400 italic">90%</span>
+                  <span className="block text-gray-900">who refused</span>
+                  <span className="block text-gray-400 italic">to quit</span>
+                </h1>
+
+                <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed font-light">
+                  We've been where you are. We've felt the pain, the rejection, the sleepless nights.
+                  <br />
+                  <span className="text-gray-900 font-normal">But we didn't give up.</span>
+                </p>
+              </div>
             </div>
 
-            {/* Floating Stats - Mobile Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mt-12 md:mt-16">
+            {/* Floating Stats */}
+            <div
+              className={`grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto transition-all duration-1000 delay-700 ${
+                isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+            >
               {[
-                { number: "90%", label: "Startup Failure Rate", icon: Target, color: "red" },
-                { number: "10%", label: "Success Stories", icon: Star, color: "yellow" },
-                { number: "100%", label: "Our Commitment", icon: Heart, color: "pink" },
-                { number: "∞", label: "Possibilities", icon: Sparkles, color: "cyan" },
+                { number: "90%", label: "Startup Failure Rate", icon: Target },
+                { number: "10%", label: "Success Stories", icon: Star },
+                { number: "100%", label: "Our Commitment", icon: Heart },
+                { number: "∞", label: "Possibilities", icon: Lightbulb },
               ].map((stat, index) => (
                 <Card
                   key={index}
-                  className="group bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 hover:-translate-y-2"
+                  className={`border-0 shadow-none bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-500 group cursor-default transform hover:scale-105 ${
+                    isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                  }`}
+                  style={{ transitionDelay: `${800 + index * 100}ms` }}
                 >
-                  <CardContent className="p-4 md:p-6 text-center">
-                    <div
-                      className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 md:mb-4 bg-gradient-to-br ${
-                        stat.color === "red"
-                          ? "from-red-500/20 to-red-600/20 border border-red-500/30"
-                          : stat.color === "yellow"
-                            ? "from-yellow-500/20 to-yellow-600/20 border border-yellow-500/30"
-                            : stat.color === "pink"
-                              ? "from-pink-500/20 to-pink-600/20 border border-pink-500/30"
-                              : "from-cyan-500/20 to-cyan-600/20 border border-cyan-500/30"
-                      } group-hover:scale-110 transition-transform`}
-                    >
-                      <stat.icon
-                        className={`h-5 w-5 md:h-6 md:w-6 ${
-                          stat.color === "red"
-                            ? "text-red-400"
-                            : stat.color === "yellow"
-                              ? "text-yellow-400"
-                              : stat.color === "pink"
-                                ? "text-pink-400"
-                                : "text-cyan-400"
-                        }`}
-                      />
+                  <CardContent className="p-6 text-center">
+                    <div className="w-8 h-8 mx-auto mb-3 text-gray-400 group-hover:text-gray-600 transition-colors">
+                      <stat.icon className="w-full h-full" strokeWidth={1} />
                     </div>
-                    <div className="text-2xl md:text-3xl font-black text-white mb-2">{stat.number}</div>
-                    <p className="text-xs md:text-sm text-gray-400">{stat.label}</p>
+                    <div className="text-2xl font-light text-gray-900 mb-2">{stat.number}</div>
+                    <p className="text-sm text-gray-500 font-light">{stat.label}</p>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+
+            {/* Scroll indicator */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+              <ChevronDown className="h-6 w-6 text-gray-400" />
             </div>
           </div>
         </div>
       </section>
 
       {/* The Problem Section */}
-      <section className="py-32 relative">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-6xl font-black mb-8">
-                <span className="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-                  The Problem
-                </span>
-                <br />
-                <span className="text-white">Everyone Talks About</span>
-              </h2>
-              <p className="text-xl text-gray-300 leading-relaxed max-w-4xl mx-auto">
-                Every time someone says <span className="text-red-400 font-bold">"90% of startups fail,"</span>
-                they list the same tired reasons. But nobody offers real solutions.
-              </p>
+      <section id="problem" ref={problemRef} className="py-24 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-6xl">
+          <div
+            className={`text-center mb-20 transition-all duration-1000 ${
+              isVisible.problem ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">
+              The Problem
+              <br />
+              <span className="text-gray-600">Everyone Talks About</span>
+            </h2>
+            <p className="text-xl text-gray-600 leading-relaxed max-w-4xl mx-auto font-light">
+              Every time someone says <span className="text-gray-900 font-normal">"90% of startups fail,"</span>
+              they list the same tired reasons. But nobody offers real solutions.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {[
+              { reason: "No product-market fit", icon: Target },
+              { reason: "Ran out of money", icon: DollarSign },
+              { reason: "Founder conflicts", icon: Users },
+              { reason: "Poor GTM strategy", icon: TrendingUp },
+            ].map((item, index) => (
+              <Card
+                key={index}
+                className={`border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500 group transform hover:scale-105 ${
+                  isVisible.problem ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <CardContent className="p-6 text-center">
+                  <div className="w-8 h-8 mx-auto mb-4 text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <item.icon className="w-full h-full" strokeWidth={1} />
+                  </div>
+                  <X className="h-6 w-6 text-gray-400 mx-auto mb-3" strokeWidth={1} />
+                  <p className="text-gray-600 font-light">{item.reason}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div
+            className={`text-center space-y-8 transition-all duration-1000 delay-500 ${
+              isVisible.problem ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <div className="max-w-4xl mx-auto">
+              <h3 className="text-2xl font-light mb-6 text-gray-900">But here's what they don't tell you:</h3>
+              <div className="grid md:grid-cols-3 gap-6 text-lg text-gray-600 font-light">
+                <p>No one stays to rebuild with you.</p>
+                <p>No one walks into the trenches with you.</p>
+                <p>Everyone just... moves on.</p>
+              </div>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-              {[
-                { reason: "No product-market fit", icon: Target },
-                { reason: "Ran out of money", icon: DollarSign },
-                { reason: "Founder conflicts", icon: Users },
-                { reason: "Poor GTM strategy", icon: TrendingUp },
-              ].map((item, index) => (
-                <Card
-                  key={index}
-                  className="group bg-gradient-to-br from-red-900/20 to-red-800/20 backdrop-blur-xl border border-red-500/30 hover:border-red-400/50 transition-all duration-300 hover:scale-105"
-                >
-                  <CardContent className="p-6 text-center">
-                    <div className="w-12 h-12 bg-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                      <item.icon className="h-6 w-6 text-red-400" />
-                    </div>
-                    <X className="h-6 w-6 text-red-400 mx-auto mb-3" />
-                    <p className="text-gray-300 font-medium">{item.reason}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <div className="text-center space-y-8">
-              <div className="max-w-4xl mx-auto">
-                <h3 className="text-3xl font-bold text-white mb-6">But here's what they don't tell you:</h3>
-                <div className="grid md:grid-cols-3 gap-6 text-lg text-gray-400">
-                  <p>No one stays to rebuild with you.</p>
-                  <p>No one walks into the trenches with you.</p>
-                  <p>Everyone just... moves on.</p>
-                </div>
-              </div>
-
-              <div className="pt-12">
-                <Card className="max-w-2xl mx-auto bg-gradient-to-br from-cyan-500/10 to-purple-500/10 backdrop-blur-xl border border-cyan-500/30">
-                  <CardContent className="p-8 text-center">
-                    <Lightbulb className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                      That's where VentureCrafters was born.
-                    </h3>
-                    <p className="text-gray-300 leading-relaxed">
-                      We decided to be the partners we wished we had when we were struggling founders.
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+            <div className="pt-12">
+              <Card className="max-w-2xl mx-auto border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500">
+                <CardContent className="p-8 text-center">
+                  <Lightbulb className="h-8 w-8 text-gray-400 mx-auto mb-4" strokeWidth={1} />
+                  <h3 className="text-xl font-light text-gray-900 mb-4">That's where VentureCrafters was born.</h3>
+                  <p className="text-gray-600 leading-relaxed font-light">
+                    We decided to be the partners we wished we had when we were struggling founders.
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
       </section>
 
       {/* Our Journey Section */}
-      <section className="py-32 relative">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-6xl font-black mb-8">
-                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Our Journey
-                </span>
-                <br />
-                <span className="text-white">From Failure to Success</span>
-              </h2>
+      <section id="journey" ref={journeyRef} className="py-24 px-6">
+        <div className="container mx-auto max-w-6xl">
+          <div
+            className={`text-center mb-20 transition-all duration-1000 ${
+              isVisible.journey ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">
+              Our Journey
+              <br />
+              <span className="text-gray-600">From Failure to Success</span>
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+            <div
+              className={`space-y-8 transition-all duration-1000 ${
+                isVisible.journey ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+              }`}
+            >
+              <div className="space-y-6">
+                <h3 className="text-2xl font-light text-gray-900">We've Been There</h3>
+                <p className="text-xl text-gray-600 leading-relaxed font-light">
+                  We've sat on that side of the table, feeling the weight of uncertainty.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                {[
+                  { text: "Pitched with trembling hands to skeptical investors", icon: Users },
+                  { text: "Watched dashboards flatline at 3 AM", icon: TrendingUp },
+                  { text: "Burnt through capital and had to rebuild from scratch", icon: DollarSign },
+                  { text: "Faced rejection after rejection, but kept going", icon: Heart },
+                ].map((experience, index) => (
+                  <div
+                    key={index}
+                    className={`flex items-center space-x-4 p-4 rounded-none bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300 ${
+                      isVisible.journey ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                    }`}
+                    style={{ transitionDelay: `${index * 100}ms` }}
+                  >
+                    <div className="w-6 h-6 text-gray-400">
+                      <experience.icon className="w-full h-full" strokeWidth={1} />
+                    </div>
+                    <span className="text-gray-600 flex-1 font-light">{experience.text}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-6">
+                <p className="text-xl text-gray-600 leading-relaxed font-light">
+                  And through all of this, we gained something invaluable—
+                  <span className="text-gray-900 font-normal"> real clarity</span> on what founders actually need.
+                </p>
+              </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
-              <div className="space-y-8">
-                <div className="space-y-6">
-                  <h3 className="text-3xl font-bold text-white">We've Been There</h3>
-                  <p className="text-xl text-gray-300 leading-relaxed">
-                    We've sat on that side of the table, feeling the weight of uncertainty.
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  {[
-                    { text: "Pitched with trembling hands to skeptical investors", icon: Users, color: "red" },
-                    { text: "Watched dashboards flatline at 3 AM", icon: TrendingUp, color: "orange" },
-                    {
-                      text: "Burnt through capital and had to rebuild from scratch",
-                      icon: DollarSign,
-                      color: "yellow",
-                    },
-                    { text: "Faced rejection after rejection, but kept going", icon: Heart, color: "pink" },
-                  ].map((experience, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center space-x-4 p-4 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300"
-                    >
-                      <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${
-                          experience.color === "red"
-                            ? "from-red-500/20 to-red-600/20"
-                            : experience.color === "orange"
-                              ? "from-orange-500/20 to-orange-600/20"
-                              : experience.color === "yellow"
-                                ? "from-yellow-500/20 to-yellow-600/20"
-                                : "from-pink-500/20 to-pink-600/20"
-                        }`}
-                      >
-                        <experience.icon
-                          className={`h-5 w-5 ${
-                            experience.color === "red"
-                              ? "text-red-400"
-                              : experience.color === "orange"
-                                ? "text-orange-400"
-                                : experience.color === "yellow"
-                                  ? "text-yellow-400"
-                                  : "text-pink-400"
-                          }`}
-                        />
-                      </div>
-                      <span className="text-gray-300 flex-1">{experience.text}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="pt-6">
-                  <p className="text-xl text-gray-300 leading-relaxed">
-                    And through all of this, we gained something invaluable—
-                    <span className="text-cyan-400 font-bold"> real clarity</span> on what founders actually need.
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative">
-                <Card className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 shadow-2xl">
-                  <CardContent className="p-0 text-center space-y-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-3xl flex items-center justify-center mx-auto">
-                      <Brain className="h-10 w-10 text-white" />
-                    </div>
-                    <div className="space-y-4">
-                      <Quote className="h-8 w-8 text-cyan-400 mx-auto" />
-                      <h3 className="text-2xl font-bold text-white">Our Realization</h3>
-                      <p className="text-lg text-gray-300 leading-relaxed">
-                        Founders don't fail because they're wrong or incompetent.
-                      </p>
-                      <p className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                        They fail because they're alone.
-                      </p>
-                    </div>
-                    <div className="flex justify-center space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Floating elements */}
-                <div className="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full blur-xl opacity-60 animate-pulse" />
-                <div className="absolute -bottom-6 -left-6 w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full blur-xl opacity-50 animate-pulse delay-1000" />
-              </div>
+            <div
+              className={`relative transition-all duration-1000 delay-300 ${
+                isVisible.journey ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+              }`}
+            >
+              <Card className="border-0 shadow-none bg-gray-50 hover:shadow-lg transition-all duration-500 p-8">
+                <CardContent className="p-0 text-center space-y-6">
+                  <div className="w-12 h-12 text-gray-400 mx-auto">
+                    <Brain className="w-full h-full" strokeWidth={1} />
+                  </div>
+                  <div className="space-y-4">
+                    <Quote className="h-6 w-6 text-gray-400 mx-auto" strokeWidth={1} />
+                    <h3 className="text-xl font-light text-gray-900">Our Realization</h3>
+                    <p className="text-lg text-gray-600 leading-relaxed font-light">
+                      Founders don't fail because they're wrong or incompetent.
+                    </p>
+                    <p className="text-xl font-normal text-gray-900">They fail because they're alone.</p>
+                  </div>
+                  <div className="flex justify-center space-x-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-gray-400 text-gray-400" />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
       </section>
 
       {/* What We Do Now Section */}
-      <section className="py-32 relative">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-6xl font-black mb-8 text-white">What We Do Now</h2>
-              <p className="text-xl text-gray-300 leading-relaxed max-w-4xl mx-auto">
-                At VentureCrafters, we help founders build real, fundable, scalable businesses with execution-first
-                thinking, hands-on support, and brutal honesty.
-              </p>
-            </div>
+      <section className="py-24 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">What We Do Now</h2>
+            <p className="text-xl text-gray-600 leading-relaxed max-w-4xl mx-auto font-light">
+              At VentureCrafters, we help founders build real, fundable, scalable businesses with execution-first
+              thinking, hands-on support, and brutal honesty.
+            </p>
+          </div>
 
-            <div className="grid md:grid-cols-2 gap-8 mb-16">
-              <Card className="group bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 backdrop-blur-xl border border-cyan-500/30 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                      <span className="text-white font-bold text-lg">90%</span>
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            <Card className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500 group">
+              <CardContent className="p-8">
+                <div className="flex items-center mb-6">
+                  <div className="w-8 h-8 text-gray-400 mr-4 group-hover:text-gray-600 transition-colors">
+                    <span className="text-2xl font-light">90%</span>
+                  </div>
+                  <h3 className="text-xl font-light text-gray-900">If you're in the 90%</h3>
+                </div>
+                <p className="text-gray-600 text-lg leading-relaxed mb-6 font-light">
+                  We'll help you build smarter, faster, and with more structure. No more shooting in the dark.
+                </p>
+                <div className="space-y-3">
+                  {["Strategic Planning", "MVP Development", "Market Validation"].map((feature, idx) => (
+                    <div key={idx} className="flex items-center text-gray-600 font-light">
+                      <CheckCircle className="w-4 h-4 mr-2 text-gray-400" strokeWidth={1} />
+                      <span className="text-sm">{feature}</span>
                     </div>
-                    <h3 className="text-2xl font-bold text-white">If you're in the 90%</h3>
-                  </div>
-                  <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                    We'll help you build smarter, faster, and with more structure. No more shooting in the dark.
-                  </p>
-                  <div className="space-y-3">
-                    {["Strategic Planning", "MVP Development", "Market Validation"].map((feature, idx) => (
-                      <div key={idx} className="flex items-center text-cyan-300">
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        <span className="text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card className="group bg-gradient-to-br from-purple-500/10 to-purple-600/10 backdrop-blur-xl border border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 hover:scale-105">
-                <CardContent className="p-8">
-                  <div className="flex items-center mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                      <span className="text-white font-bold text-lg">10%</span>
+            <Card className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500 group">
+              <CardContent className="p-8">
+                <div className="flex items-center mb-6">
+                  <div className="w-8 h-8 text-gray-400 mr-4 group-hover:text-gray-600 transition-colors">
+                    <span className="text-2xl font-light">10%</span>
+                  </div>
+                  <h3 className="text-xl font-light text-gray-900">If you're in the 10%</h3>
+                </div>
+                <p className="text-gray-600 text-lg leading-relaxed mb-6 font-light">
+                  We'll back you with fundraising support, growth planning, tech builds, and investor connections.
+                </p>
+                <div className="space-y-3">
+                  {["Fundraising Support", "Growth Strategy", "Investor Network"].map((feature, idx) => (
+                    <div key={idx} className="flex items-center text-gray-600 font-light">
+                      <CheckCircle className="w-4 h-4 mr-2 text-gray-400" strokeWidth={1} />
+                      <span className="text-sm">{feature}</span>
                     </div>
-                    <h3 className="text-2xl font-bold text-white">If you're in the 10%</h3>
-                  </div>
-                  <p className="text-gray-300 text-lg leading-relaxed mb-6">
-                    We'll back you with fundraising support, growth planning, tech builds, and investor connections.
-                  </p>
-                  <div className="space-y-3">
-                    {["Fundraising Support", "Growth Strategy", "Investor Network"].map((feature, idx) => (
-                      <div key={idx} className="flex items-center text-purple-300">
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        <span className="text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            <div className="text-center">
-              <Card className="max-w-2xl mx-auto bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border border-white/10">
-                <CardContent className="p-8">
-                  <Coffee className="h-12 w-12 text-orange-400 mx-auto mb-4" />
-                  <p className="text-xl text-gray-300 leading-relaxed">
-                    <span className="font-bold text-white">No fluff. No VC lingo.</span>
-                    <br />
-                    Just clear paths and committed people who've walked the journey.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
+          <div className="text-center">
+            <Card className="max-w-2xl mx-auto border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500">
+              <CardContent className="p-8">
+                <Coffee className="h-8 w-8 text-gray-400 mx-auto mb-4" strokeWidth={1} />
+                <p className="text-xl text-gray-600 leading-relaxed font-light">
+                  <span className="font-normal text-gray-900">No fluff. No VC lingo.</span>
+                  <br />
+                  Just clear paths and committed people who've walked the journey.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Validation Section */}
-      <section className="py-32 relative">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-6xl font-black mb-8">
-                <span className="text-gray-500">Our Validation?</span>
-                <br />
-                <span className="bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
-                  We Don't Just Talk. We Build.
-                </span>
-              </h2>
-            </div>
+      <section id="validation" ref={validationRef} className="py-24 px-6">
+        <div className="container mx-auto max-w-6xl">
+          <div
+            className={`text-center mb-20 transition-all duration-1000 ${
+              isVisible.validation ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">
+              <span className="text-gray-500">Our Validation?</span>
+              <br />
+              We Don't Just Talk. We Build.
+            </h2>
+          </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            {[
+              {
+                icon: Lightbulb,
+                number: "12+",
+                title: "MVPs Launched",
+                desc: "Across fintech, travel tech, D2C, and last-mile delivery",
+              },
+              {
+                icon: DollarSign,
+                number: "$600K+",
+                title: "Capital Raised",
+                desc: "Helped startups secure funding across early-stage deals",
+              },
+              {
+                icon: Globe,
+                number: "Global",
+                title: "Network",
+                desc: "Worldwide connections with operators, angels, and builders",
+              },
+              {
+                icon: Award,
+                number: "100%",
+                title: "Commitment",
+                desc: "Led by ex-founders who've built and scaled multiple times",
+              },
+            ].map((stat, index) => (
+              <Card
+                key={index}
+                className={`border-0 shadow-none bg-gray-50 hover:bg-white hover:shadow-lg transition-all duration-500 group transform hover:scale-105 ${
+                  isVisible.validation ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <CardContent className="p-8 text-center">
+                  <div className="w-10 h-10 mx-auto mb-6 text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <stat.icon className="w-full h-full" strokeWidth={1} />
+                  </div>
+                  <div className="text-2xl font-light text-gray-900 mb-2">{stat.number}</div>
+                  <h4 className="text-lg font-light text-gray-900 mb-3">{stat.title}</h4>
+                  <p className="text-sm text-gray-600 leading-relaxed font-light">{stat.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center space-y-6">
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
               {[
-                {
-                  icon: Lightbulb,
-                  number: "12+",
-                  title: "MVPs Launched",
-                  desc: "Across fintech, travel tech, D2C, and last-mile delivery",
-                  color: "cyan",
-                },
-                {
-                  icon: DollarSign,
-                  number: "$600K+",
-                  title: "Capital Raised",
-                  desc: "Helped startups secure funding across early-stage deals",
-                  color: "purple",
-                },
-                {
-                  icon: Globe,
-                  number: "Global",
-                  title: "Network",
-                  desc: "Worldwide connections with operators, angels, and builders",
-                  color: "pink",
-                },
-                {
-                  icon: Award,
-                  number: "100%",
-                  title: "Commitment",
-                  desc: "Led by ex-founders who've built and scaled multiple times",
-                  color: "orange",
-                },
-              ].map((stat, index) => (
-                <Card
+                { icon: Zap, text: "Helped founders get investor-ready in 30 days" },
+                { icon: Rocket, text: "Built startups from idea to revenue in 60 days" },
+                { icon: Target, text: "Said NO to vanity projects" },
+              ].map((achievement, index) => (
+                <div
                   key={index}
-                  className="group bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300 hover:scale-105 hover:-translate-y-2"
+                  className="p-6 rounded-none bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300"
                 >
-                  <CardContent className="p-8 text-center">
-                    <div
-                      className={`w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-6 bg-gradient-to-br ${
-                        stat.color === "cyan"
-                          ? "from-cyan-500/20 to-cyan-600/20 border border-cyan-500/30"
-                          : stat.color === "purple"
-                            ? "from-purple-500/20 to-purple-600/20 border border-purple-500/30"
-                            : stat.color === "pink"
-                              ? "from-pink-500/20 to-pink-600/20 border border-pink-500/30"
-                              : "from-orange-500/20 to-orange-600/20 border border-orange-500/30"
-                      } group-hover:scale-110 transition-transform`}
-                    >
-                      <stat.icon
-                        className={`h-8 w-8 ${
-                          stat.color === "cyan"
-                            ? "text-cyan-400"
-                            : stat.color === "purple"
-                              ? "text-purple-400"
-                              : stat.color === "pink"
-                                ? "text-pink-400"
-                                : "text-orange-400"
-                        }`}
-                      />
-                    </div>
-                    <div className="text-3xl font-black text-white mb-2">{stat.number}</div>
-                    <h4 className="text-lg font-bold text-gray-200 mb-3">{stat.title}</h4>
-                    <p className="text-sm text-gray-400 leading-relaxed">{stat.desc}</p>
-                  </CardContent>
-                </Card>
+                  <achievement.icon className="h-6 w-6 text-gray-400 mx-auto mb-3" strokeWidth={1} />
+                  <p className="text-lg text-gray-600 font-light">{achievement.text}</p>
+                </div>
               ))}
-            </div>
-
-            <div className="text-center space-y-6">
-              <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-                <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-                  <Zap className="h-8 w-8 text-yellow-400 mx-auto mb-3" />
-                  <p className="text-lg text-gray-300">
-                    Helped founders get investor-ready in <span className="text-white font-bold">30 days</span>
-                  </p>
-                </div>
-                <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-                  <Rocket className="h-8 w-8 text-cyan-400 mx-auto mb-3" />
-                  <p className="text-lg text-gray-300">
-                    Built startups from idea to revenue in <span className="text-white font-bold">60 days</span>
-                  </p>
-                </div>
-                <div className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
-                  <Target className="h-8 w-8 text-pink-400 mx-auto mb-3" />
-                  <p className="text-lg text-gray-300">
-                    Said <span className="text-red-400 font-bold">NO</span> to vanity projects
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Join the Movement Section */}
-      <section className="py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600 opacity-90" />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="container mx-auto px-4 relative z-10 text-center">
-          <div className="max-w-4xl mx-auto space-y-12">
+      <section className="py-24 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-4xl text-center">
+          <div className="space-y-12">
             <div className="space-y-8">
-              <h2 className="text-5xl md:text-6xl font-black text-white">Join the Movement</h2>
-              <div className="space-y-6 text-xl text-white/90">
+              <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">Join the Movement</h2>
+              <div className="space-y-6 text-xl text-gray-600 font-light">
                 <p>
-                  This is more than a service. <span className="font-bold">It's a mindset.</span>
+                  This is more than a service. <span className="font-normal text-gray-900">It's a mindset.</span>
                 </p>
                 <p>We're building a global tribe of builders who help each other win.</p>
                 <p>Because we've been there. And we're here now.</p>
@@ -563,24 +637,30 @@ export default function AboutPage() {
             </div>
 
             <div className="space-y-8">
-              <h3 className="text-3xl font-bold text-white">
+              <h3 className="text-2xl font-light text-gray-900">
                 VentureCrafters — Built by the 90%. Here to change the stats.
               </h3>
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Button
                   size="lg"
-                  className="bg-white text-gray-900 hover:bg-gray-100 text-xl px-16 py-8 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-all duration-300"
+                  className="bg-gray-900 text-white hover:bg-gray-800 px-12 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 group"
+                  onClick={() =>
+                    window.open(
+                      "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
+                      "_blank",
+                    )
+                  }
                 >
                   Start Your Journey
-                  <Rocket className="ml-3 h-6 w-6" />
+                  <Rocket className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={1} />
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-xl px-16 py-8 rounded-2xl font-bold transition-all duration-300 hover:scale-105"
+                  className="border-gray-300 text-gray-600 hover:bg-gray-50 px-12 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 group"
                 >
                   Book Discovery Call
-                  <ArrowRight className="ml-3 h-6 w-6" />
+                  <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={1} />
                 </Button>
               </div>
             </div>
@@ -589,44 +669,41 @@ export default function AboutPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black/50 backdrop-blur-xl py-16 border-t border-white/10">
-        <div className="container mx-auto px-4">
+      <footer className="py-16 px-6 border-t border-gray-100">
+        <div className="container mx-auto max-w-4xl">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
-              <img src="/images/venturecrafters-latest-logo.png" alt="VentureCrafters Logo" className="h-12 w-auto" />
+              <img
+                src="/images/venturecrafters-latest-logo.png"
+                alt="VentureCrafters Logo"
+                className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity duration-300"
+              />
             </div>
-            <p className="text-gray-400 text-lg">Building the future, one startup at a time.</p>
-            <div className="flex justify-center space-x-8">
-              <Link href="/" className="text-gray-400 hover:text-cyan-400 transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-cyan-400 font-semibold">
-                About
-              </Link>
-              <Link href="/services" className="text-gray-400 hover:text-purple-400 transition-colors">
-                Services
-              </Link>
-              <Link href="/portfolio" className="text-gray-400 hover:text-pink-400 transition-colors">
-                Portfolio
-              </Link>
-              <Link href="/contact" className="text-gray-400 hover:text-orange-400 transition-colors">
-                Contact
-              </Link>
+            <p className="text-gray-500 font-light">Building the future, one startup at a time.</p>
+            <div className="flex justify-center space-x-8 text-sm">
+              {["Home", "About", "Services", "Portfolio", "Contact"].map((item) => (
+                <Link
+                  key={item}
+                  href={item === "Home" ? "/" : item === "About" ? "/about" : `/${item.toLowerCase()}`}
+                  className={`font-light transition-all duration-300 relative group ${
+                    item === "About" ? "text-gray-900" : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  {item}
+                  <span
+                    className={`absolute -bottom-1 left-0 h-px bg-gray-900 transition-all duration-300 ${
+                      item === "About" ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
+                </Link>
+              ))}
             </div>
-            <div className="pt-8 border-t border-white/10 text-gray-500">
+            <div className="pt-8 border-t border-gray-100 text-gray-400 text-sm font-light">
               <p>&copy; 2024 VentureCrafters. All rights reserved.</p>
             </div>
           </div>
         </div>
       </footer>
-
-      <style jsx>{`
-        @keyframes grid-float {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          33% { transform: translate(30px, -30px) rotate(1deg); }
-          66% { transform: translate(-20px, 20px) rotate(-1deg); }
-        }
-      `}</style>
     </div>
   )
 }

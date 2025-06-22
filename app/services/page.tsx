@@ -22,144 +22,261 @@ import {
   BarChart3,
   Briefcase,
   Handshake,
-  Star,
   Sparkles,
   Clock,
   Phone,
   Mail,
+  Menu,
+  ChevronDown,
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 export default function ServicesPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
+  const [activeSection, setActiveSection] = useState("hero")
+  const [isVisible, setIsVisible] = useState({})
+
+  const heroRef = useRef(null)
+  const pillarsRef = useRef(null)
+  const differenceRef = useRef(null)
 
   useEffect(() => {
     setIsLoaded(true)
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
+    const handleScroll = () => setScrollY(window.scrollY)
+
     window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
+    window.addEventListener("scroll", handleScroll)
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("scroll", handleScroll)
+    }
   }, [])
 
+  // Intersection Observer for animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible((prev) => ({ ...prev, [entry.target.id]: true }))
+            setActiveSection(entry.target.id)
+          }
+        })
+      },
+      { threshold: 0.3 },
+    )
+
+    const sections = [heroRef, pillarsRef, differenceRef]
+    sections.forEach((ref) => {
+      if (ref.current) observer.observe(ref.current)
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  const parallaxOffset = scrollY * 0.3
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950 text-white overflow-x-hidden relative">
-      {/* Custom Cursor */}
+    <div className="min-h-screen bg-white text-gray-900 font-light overflow-x-hidden">
+      {/* Custom cursor */}
       <div
-        className="fixed w-6 h-6 bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full pointer-events-none z-50 mix-blend-difference transition-transform duration-150 ease-out hidden md:block"
+        className="fixed w-4 h-4 bg-gray-900 rounded-full pointer-events-none z-50 mix-blend-difference transition-transform duration-200 ease-out hidden md:block"
         style={{
-          left: mousePosition.x - 12,
-          top: mousePosition.y - 12,
+          left: mousePosition.x - 8,
+          top: mousePosition.y - 8,
           transform: `scale(${isLoaded ? 1 : 0})`,
         }}
       />
 
-      {/* Animated Background */}
-      <div className="fixed inset-0 opacity-10">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
-            `,
-            backgroundSize: "60px 60px",
-            animation: "grid-float 20s ease-in-out infinite",
-          }}
-        />
-      </div>
-
-      {/* Floating Orbs */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 rounded-full blur-3xl animate-pulse delay-2000" />
+      {/* Floating navigation dots */}
+      <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40 hidden lg:block">
+        <div className="space-y-4">
+          {[
+            { id: "hero", label: "Overview" },
+            { id: "pillars", label: "Four Pillars" },
+            { id: "difference", label: "Difference" },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth" })
+              }}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                activeSection === item.id ? "bg-gray-900 scale-125" : "bg-gray-300 hover:bg-gray-600"
+              }`}
+              title={item.label}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Logo */}
-      <div className="absolute top-6 left-6 z-40">
+      <div className="fixed top-6 left-6 z-50">
         <Link href="/" className="group">
           <img
             src="/images/venturecrafters-latest-logo.png"
             alt="VentureCrafters"
-            className="h-10 w-auto hover:scale-110 transition-transform duration-300"
+            className={`h-8 w-auto transition-all duration-500 ${
+              scrollY > 100 ? "opacity-60 scale-90" : "opacity-100 scale-100"
+            } hover:opacity-100 hover:scale-100`}
           />
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-40 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-full px-8 py-4 shadow-2xl">
-        <div className="flex items-center space-x-8">
-          <div className="hidden md:flex space-x-6 text-sm font-medium">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors relative group">
-              Home
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/about" className="text-gray-300 hover:text-white transition-colors relative group">
-              About
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/services" className="text-cyan-400 font-semibold relative">
-              Services
-              <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400" />
-            </Link>
-            <Link href="/portfolio" className="text-gray-300 hover:text-white transition-colors relative group">
-              Portfolio
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
-            <Link href="/contact" className="text-gray-300 hover:text-white transition-colors relative group">
-              Contact
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-            </Link>
+      {/* Mobile Menu Button */}
+      <div className="fixed top-6 right-6 z-50 md:hidden">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+        >
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        className={`fixed inset-0 z-40 bg-white md:hidden transition-transform duration-500 ease-in-out ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex flex-col items-center justify-center h-full space-y-8 text-center">
+          {["Home", "About", "Services", "Portfolio", "Contact"].map((item, index) => (
+            <div
+              key={item}
+              className={`transition-all duration-500 delay-${index * 100} ${
+                mobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`}
+            >
+              <Link
+                href={item === "Home" ? "/" : item === "Services" ? "/services" : `/${item.toLowerCase()}`}
+                className="text-2xl font-light text-gray-600 hover:text-gray-900 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item}
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Navigation */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 hidden md:block ${
+          scrollY > 50 ? "bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm" : "bg-transparent"
+        }`}
+      >
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-12">
+              <div className="w-8"></div>
+              <div className="flex space-x-8 text-sm font-light">
+                <Link href="/" className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group">
+                  Home
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/about"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  About
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link href="/services" className="text-gray-900 font-medium transition-all duration-300 relative group">
+                  Services
+                  <span className="absolute -bottom-1 left-0 w-full h-px bg-gray-900" />
+                </Link>
+                <Link
+                  href="/portfolio"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  Portfolio
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+                <Link
+                  href="/contact"
+                  className="text-gray-600 hover:text-gray-900 transition-all duration-300 relative group"
+                >
+                  Contact
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-gray-900 transition-all duration-300 group-hover:w-full" />
+                </Link>
+              </div>
+            </div>
+            <Button
+              className="bg-gray-900 text-white hover:bg-gray-800 px-6 py-2 rounded-none font-light text-sm transition-all duration-300 hover:scale-105"
+              onClick={() =>
+                window.open(
+                  "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
+                  "_blank",
+                )
+              }
+            >
+              Let's Work Together
+            </Button>
           </div>
-          <Button
-            className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 border-0 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            onClick={() =>
-              window.open(
-                "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
-                "_blank",
-              )
-            }
-          >
-            Let's Build
-            <Rocket className="ml-2 h-4 w-4" />
-          </Button>
         </div>
       </nav>
 
-      {/* Hero Section - Mobile Optimized */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-20 px-4 relative">
-        <div className="container mx-auto">
-          <div className="max-w-6xl mx-auto text-center space-y-8 md:space-y-12">
-            <div className="space-y-6 md:space-y-8">
-              <Badge className="bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-300 border-orange-500/30 text-base md:text-lg px-4 md:px-6 py-2 md:py-3 rounded-full">
-                <Rocket className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-                The Only Execution Platform Founders Need
-              </Badge>
+      {/* Hero Section */}
+      <section
+        id="hero"
+        ref={heroRef}
+        className="min-h-screen flex items-center pt-20 pb-16 px-6 relative overflow-hidden"
+      >
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-5" style={{ transform: `translateY(${parallaxOffset}px)` }}>
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gray-900 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-gray-600 rounded-full blur-2xl" />
+        </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black leading-tight">
-                <span className="block text-white">We're Not a</span>
-                <span className="block bg-gradient-to-r from-red-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
-                  Cohort
-                </span>
-                <span className="block text-white">We're Your</span>
-                <span className="block bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Execution Partner
-                </span>
-              </h1>
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="text-center space-y-12">
+            <div className="space-y-8">
+              <div
+                className={`inline-block transition-all duration-1000 delay-300 ${
+                  isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+              >
+                <Badge variant="outline" className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light">
+                  <Rocket className="w-4 h-4 mr-2" />
+                  The Only Execution Platform Founders Need
+                </Badge>
+              </div>
 
-              <div className="max-w-4xl mx-auto space-y-4 md:space-y-6 text-lg md:text-xl text-gray-300">
-                <p className="leading-relaxed">
-                  We're a <span className="text-cyan-400 font-bold">full-stack execution partner</span> built for
+              <div
+                className={`space-y-6 transition-all duration-1000 delay-500 ${
+                  isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                }`}
+              >
+                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight leading-tight tracking-tight">
+                  <span className="block text-gray-900">We're Not a</span>
+                  <span className="block text-gray-400 italic">Cohort</span>
+                  <span className="block text-gray-900">We're Your</span>
+                  <span className="block text-gray-400 italic">Execution Partner</span>
+                </h1>
+
+                <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-light">
+                  We're a <span className="text-gray-900 font-normal">full-stack execution partner</span> built for
                   founders who want to build real businesses — not just pitch decks.
                 </p>
               </div>
             </div>
 
-            {/* What We're NOT - Mobile Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
+            {/* What We're NOT */}
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto transition-all duration-1000 delay-700 ${
+                isVisible.hero ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
+            >
               {[
                 { text: "We're not a cohort", icon: X },
                 { text: "We're not a mentorship program", icon: X },
@@ -167,29 +284,34 @@ export default function ServicesPage() {
               ].map((item, index) => (
                 <Card
                   key={index}
-                  className="bg-gradient-to-br from-red-900/20 to-red-800/20 backdrop-blur-xl border border-red-500/30 hover:border-red-400/50 transition-all duration-300"
+                  className="border-0 shadow-none bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300"
                 >
-                  <CardContent className="p-4 md:p-6 text-center">
-                    <item.icon className="h-6 w-6 md:h-8 md:w-8 text-red-400 mx-auto mb-3" />
-                    <p className="text-gray-300 font-medium text-sm md:text-base">{item.text}</p>
+                  <CardContent className="p-6 text-center">
+                    <item.icon className="h-6 w-6 text-gray-400 mx-auto mb-3" strokeWidth={1} />
+                    <p className="text-gray-600 font-light text-sm">{item.text}</p>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+
+            {/* Scroll indicator */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+              <ChevronDown className="h-6 w-6 text-gray-400" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Four Pillars Section */}
-      <section className="py-32 px-4 relative">
-        <div className="container mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-black mb-8">
-              <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Our Uniquely Simple Model
-              </span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+      <section id="pillars" ref={pillarsRef} className="py-24 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-6xl">
+          <div
+            className={`text-center mb-20 transition-all duration-1000 ${
+              isVisible.pillars ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">Our Uniquely Simple Model</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-light">
               Four integrated pillars that transform how you build, scale, and fund your startup.
             </p>
           </div>
@@ -197,24 +319,28 @@ export default function ServicesPage() {
           <div className="space-y-20">
             {/* Pillar 1: Personal Execution Partner */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-8">
+              <div
+                className={`space-y-8 transition-all duration-1000 ${
+                  isVisible.pillars ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+                }`}
+              >
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-8 h-8 bg-gray-900 rounded-none flex items-center justify-center text-white font-light text-lg">
                     1
                   </div>
-                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 text-sm px-4 py-2">
+                  <Badge variant="outline" className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light">
                     <Users className="w-4 h-4 mr-2" />
                     Core Service
                   </Badge>
                 </div>
 
                 <div className="space-y-6">
-                  <h3 className="text-4xl font-black text-white">Your Personal Execution Partner</h3>
-                  <p className="text-xl text-gray-300 leading-relaxed">
+                  <h3 className="text-3xl font-light text-gray-900">Your Personal Execution Partner</h3>
+                  <p className="text-xl text-gray-600 leading-relaxed font-light">
                     We sit inside your business, every day. Not mentors. Not advisors.{" "}
-                    <span className="text-cyan-400 font-bold">Operators.</span>
+                    <span className="text-gray-900 font-normal">Operators.</span>
                   </p>
-                  <p className="text-lg text-gray-400">
+                  <p className="text-lg text-gray-500 font-light">
                     👉 We operate like a fractional co-founder — with accountability baked in.
                   </p>
                 </div>
@@ -228,31 +354,30 @@ export default function ServicesPage() {
                   ].map((feature, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10"
+                      className="flex items-center space-x-3 p-4 rounded-none bg-white hover:shadow-md transition-all duration-300"
                     >
-                      <feature.icon className="h-5 w-5 text-cyan-400 flex-shrink-0" />
-                      <span className="text-sm text-gray-300">{feature.text}</span>
+                      <feature.icon className="h-4 w-4 text-gray-400 flex-shrink-0" strokeWidth={1} />
+                      <span className="text-sm text-gray-600 font-light">{feature.text}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-600/10 backdrop-blur-xl border border-cyan-500/30 p-8">
-                <CardContent className="p-0 space-y-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-cyan-600 rounded-3xl flex items-center justify-center mx-auto">
-                    <Users className="h-8 w-8 text-white" />
+              <Card
+                className={`border-0 shadow-none bg-white hover:shadow-lg transition-all duration-1000 delay-300 ${
+                  isVisible.pillars ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+                }`}
+              >
+                <CardContent className="p-8 text-center space-y-6">
+                  <div className="w-12 h-12 text-gray-400 mx-auto">
+                    <Users className="w-full h-full" strokeWidth={1} />
                   </div>
-                  <div className="text-center space-y-4">
-                    <h4 className="text-2xl font-bold text-white">Fractional Co-Founder</h4>
-                    <p className="text-gray-300 leading-relaxed">
+                  <div className="space-y-4">
+                    <h4 className="text-xl font-light text-gray-900">Fractional Co-Founder</h4>
+                    <p className="text-gray-600 leading-relaxed font-light">
                       We don't just advise from the sidelines. We roll up our sleeves and execute alongside you, taking
                       ownership of outcomes.
                     </p>
-                    <div className="flex justify-center space-x-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      ))}
-                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -260,17 +385,20 @@ export default function ServicesPage() {
 
             {/* Pillar 2: On-Demand Services */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 backdrop-blur-xl border border-purple-500/30 p-8 lg:order-1">
-                <CardContent className="p-0 space-y-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto">
-                    <Target className="h-8 w-8 text-white" />
+              <Card className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500 lg:order-1">
+                <CardContent className="p-8 text-center space-y-6">
+                  <div className="w-12 h-12 text-gray-400 mx-auto">
+                    <Target className="w-full h-full" strokeWidth={1} />
                   </div>
-                  <div className="text-center space-y-4">
-                    <h4 className="text-2xl font-bold text-white">Specialized Experts</h4>
-                    <p className="text-gray-300 leading-relaxed">
+                  <div className="space-y-4">
+                    <h4 className="text-xl font-light text-gray-900">Specialized Experts</h4>
+                    <p className="text-gray-600 leading-relaxed font-light">
                       Access world-class specialists through our trusted partner network. No full-time hires needed.
                     </p>
-                    <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                    <Badge
+                      variant="outline"
+                      className="border-gray-200 text-gray-600 px-3 py-1 rounded-full font-light"
+                    >
                       Pay Only When Activated
                     </Badge>
                   </div>
@@ -279,21 +407,23 @@ export default function ServicesPage() {
 
               <div className="space-y-8 lg:order-2">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-8 h-8 bg-gray-900 rounded-none flex items-center justify-center text-white font-light text-lg">
                     2
                   </div>
-                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30 text-sm px-4 py-2">
+                  <Badge variant="outline" className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light">
                     <Briefcase className="w-4 h-4 mr-2" />
                     Partner Network
                   </Badge>
                 </div>
 
                 <div className="space-y-6">
-                  <h3 className="text-4xl font-black text-white">On-Demand Specialized Services</h3>
-                  <p className="text-xl text-gray-300 leading-relaxed">
+                  <h3 className="text-3xl font-light text-gray-900">On-Demand Specialized Services</h3>
+                  <p className="text-xl text-gray-600 leading-relaxed font-light">
                     You don't need to hire full-time experts early. We unlock specialized services when you need them.
                   </p>
-                  <p className="text-lg text-gray-400">👉 Only when you need it. Pay only for what you activate.</p>
+                  <p className="text-lg text-gray-500 font-light">
+                    👉 Only when you need it. Pay only for what you activate.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3">
@@ -306,10 +436,10 @@ export default function ServicesPage() {
                   ].map((service, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300"
+                      className="flex items-center space-x-3 p-4 rounded-none bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300"
                     >
-                      <service.icon className="h-5 w-5 text-purple-400 flex-shrink-0" />
-                      <span className="text-gray-300">{service.text}</span>
+                      <service.icon className="h-4 w-4 text-gray-400 flex-shrink-0" strokeWidth={1} />
+                      <span className="text-gray-600 font-light">{service.text}</span>
                     </div>
                   ))}
                 </div>
@@ -320,27 +450,24 @@ export default function ServicesPage() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-8">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-8 h-8 bg-gray-900 rounded-none flex items-center justify-center text-white font-light text-lg">
                     3
                   </div>
-                  <Badge className="bg-pink-500/20 text-pink-300 border-pink-500/30 text-sm px-4 py-2">
+                  <Badge variant="outline" className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light">
                     <Settings className="w-4 h-4 mr-2" />
                     SaaS Platform
                   </Badge>
                 </div>
 
                 <div className="space-y-6">
-                  <h3 className="text-4xl font-black">
-                    <span className="text-white">The VentureCrafters SaaS Stack — </span>
-                    <span className="bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent">
-                      FounderOS™
-                    </span>
+                  <h3 className="text-3xl font-light text-gray-900">
+                    The VentureCrafters SaaS Stack — <span className="text-gray-600 italic">FounderOS™</span>
                   </h3>
-                  <p className="text-xl text-gray-300 leading-relaxed">
+                  <p className="text-xl text-gray-600 leading-relaxed font-light">
                     We give you tools. Not spreadsheets. A custom SaaS platform designed to simplify early-stage
                     execution.
                   </p>
-                  <p className="text-lg text-gray-400">
+                  <p className="text-lg text-gray-500 font-light">
                     👉 Finally, founders have real operational tools that save time and reduce chaos.
                   </p>
                 </div>
@@ -356,27 +483,30 @@ export default function ServicesPage() {
                   ].map((feature, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10"
+                      className="flex items-center space-x-3 p-4 rounded-none bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300"
                     >
-                      <feature.icon className="h-5 w-5 text-pink-400 flex-shrink-0" />
-                      <span className="text-sm text-gray-300">{feature.text}</span>
+                      <feature.icon className="h-4 w-4 text-gray-400 flex-shrink-0" strokeWidth={1} />
+                      <span className="text-sm text-gray-600 font-light">{feature.text}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <Card className="bg-gradient-to-br from-pink-500/10 to-orange-500/10 backdrop-blur-xl border border-pink-500/30 p-8">
-                <CardContent className="p-0 space-y-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-orange-500 rounded-3xl flex items-center justify-center mx-auto">
-                    <Settings className="h-8 w-8 text-white" />
+              <Card className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500">
+                <CardContent className="p-8 text-center space-y-6">
+                  <div className="w-12 h-12 text-gray-400 mx-auto">
+                    <Settings className="w-full h-full" strokeWidth={1} />
                   </div>
-                  <div className="text-center space-y-4">
-                    <h4 className="text-2xl font-bold text-white">FounderOS™</h4>
-                    <p className="text-gray-300 leading-relaxed">
+                  <div className="space-y-4">
+                    <h4 className="text-xl font-light text-gray-900">FounderOS™</h4>
+                    <p className="text-gray-600 leading-relaxed font-light">
                       Your startup's operating system. Everything you need to run, track, and scale your business in one
                       integrated platform.
                     </p>
-                    <Badge className="bg-gradient-to-r from-pink-500/20 to-orange-500/20 text-pink-300 border-pink-500/30">
+                    <Badge
+                      variant="outline"
+                      className="border-gray-200 text-gray-600 px-3 py-1 rounded-full font-light"
+                    >
                       Coming Soon
                     </Badge>
                   </div>
@@ -386,39 +516,39 @@ export default function ServicesPage() {
 
             {/* Pillar 4: Fundraising */}
             <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-xl border border-green-500/30 p-8 lg:order-1">
-                <CardContent className="p-0 space-y-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-3xl flex items-center justify-center mx-auto">
-                    <DollarSign className="h-8 w-8 text-white" />
+              <Card className="border-0 shadow-none bg-white hover:shadow-lg transition-all duration-500 lg:order-1">
+                <CardContent className="p-8 text-center space-y-6">
+                  <div className="w-12 h-12 text-gray-400 mx-auto">
+                    <DollarSign className="w-full h-full" strokeWidth={1} />
                   </div>
-                  <div className="text-center space-y-4">
-                    <h4 className="text-2xl font-bold text-white">Fundraising Orchestration</h4>
-                    <p className="text-gray-300 leading-relaxed">
+                  <div className="space-y-4">
+                    <h4 className="text-xl font-light text-gray-900">Fundraising Orchestration</h4>
+                    <p className="text-gray-600 leading-relaxed font-light">
                       We manage your fundraise like a process — with real outcomes, not just introductions.
                     </p>
-                    <div className="text-3xl font-bold text-green-400">$600K+</div>
-                    <div className="text-sm text-gray-400">Already Raised</div>
+                    <div className="text-2xl font-light text-gray-900">$600K+</div>
+                    <div className="text-sm text-gray-500 font-light">Already Raised</div>
                   </div>
                 </CardContent>
               </Card>
 
               <div className="space-y-8 lg:order-2">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+                  <div className="w-8 h-8 bg-gray-900 rounded-none flex items-center justify-center text-white font-light text-lg">
                     4
                   </div>
-                  <Badge className="bg-green-500/20 text-green-300 border-green-500/30 text-sm px-4 py-2">
+                  <Badge variant="outline" className="border-gray-200 text-gray-600 px-4 py-2 rounded-full font-light">
                     <DollarSign className="w-4 h-4 mr-2" />
                     Fundraising
                   </Badge>
                 </div>
 
                 <div className="space-y-6">
-                  <h3 className="text-4xl font-black text-white">Fundraising Orchestration</h3>
-                  <p className="text-xl text-gray-300 leading-relaxed">
+                  <h3 className="text-3xl font-light text-gray-900">Fundraising Orchestration</h3>
+                  <p className="text-xl text-gray-600 leading-relaxed font-light">
                     You focus on building. We orchestrate the fundraising.
                   </p>
-                  <p className="text-lg text-gray-400">
+                  <p className="text-lg text-gray-500 font-light">
                     👉 We don't just introduce you. We manage your fundraise like a process — with real outcomes.
                   </p>
                 </div>
@@ -434,10 +564,10 @@ export default function ServicesPage() {
                   ].map((service, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300"
+                      className="flex items-center space-x-3 p-4 rounded-none bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300"
                     >
-                      <service.icon className="h-5 w-5 text-green-400 flex-shrink-0" />
-                      <span className="text-gray-300">{service.text}</span>
+                      <service.icon className="h-4 w-4 text-gray-400 flex-shrink-0" strokeWidth={1} />
+                      <span className="text-gray-600 font-light">{service.text}</span>
                     </div>
                   ))}
                 </div>
@@ -448,120 +578,128 @@ export default function ServicesPage() {
       </section>
 
       {/* The Difference Section */}
-      <section className="py-32 px-4 relative">
-        <div className="container mx-auto">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-6xl font-black mb-8">
-                <span className="text-white">The </span>
-                <span className="bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
-                  VentureCrafters
-                </span>
-                <span className="text-white"> Difference</span>
-              </h2>
-            </div>
+      <section id="difference" ref={differenceRef} className="py-24 px-6">
+        <div className="container mx-auto max-w-6xl">
+          <div
+            className={`text-center mb-20 transition-all duration-1000 ${
+              isVisible.difference ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <h2 className="text-4xl md:text-5xl font-extralight mb-6 text-gray-900">
+              The <span className="text-gray-600 italic">VentureCrafters</span> Difference
+            </h2>
+          </div>
 
-            <div className="grid md:grid-cols-2 gap-16">
-              {/* What Others Do */}
-              <div className="space-y-8">
-                <h3 className="text-3xl font-bold text-red-400 flex items-center">
-                  <X className="h-8 w-8 mr-3" />
-                  What Others Do
-                </h3>
-                <div className="space-y-4">
-                  {[
-                    "Cohorts with generic advice",
-                    "Mentor networks with no accountability",
-                    "Pitch days hoping for investor luck",
-                    "Spreadsheet-based tracking",
-                    "One-size-fits-all programs",
-                  ].map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center space-x-3 p-4 rounded-xl bg-red-900/20 border border-red-500/30"
-                    >
-                      <X className="h-5 w-5 text-red-400 flex-shrink-0" />
-                      <span className="text-gray-300">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* What We Do */}
-              <div className="space-y-8">
-                <h3 className="text-3xl font-bold text-green-400 flex items-center">
-                  <CheckCircle className="h-8 w-8 mr-3" />
-                  What We Do
-                </h3>
-                <div className="space-y-4">
-                  {[
-                    "Structured execution with daily accountability",
-                    "Professionalized fundraising process",
-                    "SaaS-powered startup management",
-                    "Full-stack partner on your terms",
-                    "Customized execution for your business",
-                  ].map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center space-x-3 p-4 rounded-xl bg-green-900/20 border border-green-500/30"
-                    >
-                      <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                      <span className="text-gray-300">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center mt-16">
-              <Card className="max-w-2xl mx-auto bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl border border-white/10">
-                <CardContent className="p-8">
-                  <div className="text-4xl mb-4">🎯</div>
-                  <h3 className="text-2xl font-bold text-white mb-4">That's it. No fluff. No sprints. No gimmicks.</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="flex items-center text-green-400">
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Daily Execution
-                    </div>
-                    <div className="flex items-center text-green-400">
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      On-Demand Experts
-                    </div>
-                    <div className="flex items-center text-green-400">
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Founder's SaaS Stack
-                    </div>
-                    <div className="flex items-center text-green-400">
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Fundraise Managed
-                    </div>
+          <div className="grid md:grid-cols-2 gap-16">
+            {/* What Others Do */}
+            <div
+              className={`space-y-8 transition-all duration-1000 ${
+                isVisible.difference ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+              }`}
+            >
+              <h3 className="text-2xl font-light text-gray-900 flex items-center">
+                <X className="h-6 w-6 mr-3 text-gray-400" strokeWidth={1} />
+                What Others Do
+              </h3>
+              <div className="space-y-4">
+                {[
+                  "Cohorts with generic advice",
+                  "Mentor networks with no accountability",
+                  "Pitch days hoping for investor luck",
+                  "Spreadsheet-based tracking",
+                  "One-size-fits-all programs",
+                ].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center space-x-3 p-4 rounded-none bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300"
+                  >
+                    <X className="h-4 w-4 text-gray-400 flex-shrink-0" strokeWidth={1} />
+                    <span className="text-gray-600 font-light">{item}</span>
                   </div>
-                  <p className="text-xl text-gray-300 mt-6">
-                    <span className="text-white font-bold">You build. We support. Fully integrated.</span>
-                  </p>
-                </CardContent>
-              </Card>
+                ))}
+              </div>
             </div>
+
+            {/* What We Do */}
+            <div
+              className={`space-y-8 transition-all duration-1000 delay-300 ${
+                isVisible.difference ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+              }`}
+            >
+              <h3 className="text-2xl font-light text-gray-900 flex items-center">
+                <CheckCircle className="h-6 w-6 mr-3 text-gray-400" strokeWidth={1} />
+                What We Do
+              </h3>
+              <div className="space-y-4">
+                {[
+                  "Structured execution with daily accountability",
+                  "Professionalized fundraising process",
+                  "SaaS-powered startup management",
+                  "Full-stack partner on your terms",
+                  "Customized execution for your business",
+                ].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center space-x-3 p-4 rounded-none bg-gray-50 hover:bg-white hover:shadow-md transition-all duration-300"
+                  >
+                    <CheckCircle className="h-4 w-4 text-gray-400 flex-shrink-0" strokeWidth={1} />
+                    <span className="text-gray-600 font-light">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={`text-center mt-16 transition-all duration-1000 delay-500 ${
+              isVisible.difference ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <Card className="max-w-2xl mx-auto border-0 shadow-none bg-gray-50 hover:shadow-lg transition-all duration-500">
+              <CardContent className="p-8">
+                <div className="text-3xl mb-4">🎯</div>
+                <h3 className="text-xl font-light text-gray-900 mb-4">That's it. No fluff. No sprints. No gimmicks.</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center text-gray-600 font-light">
+                    <CheckCircle className="w-3 h-3 mr-2 text-gray-400" strokeWidth={1} />
+                    Daily Execution
+                  </div>
+                  <div className="flex items-center text-gray-600 font-light">
+                    <CheckCircle className="w-3 h-3 mr-2 text-gray-400" strokeWidth={1} />
+                    On-Demand Experts
+                  </div>
+                  <div className="flex items-center text-gray-600 font-light">
+                    <CheckCircle className="w-3 h-3 mr-2 text-gray-400" strokeWidth={1} />
+                    Founder's SaaS Stack
+                  </div>
+                  <div className="flex items-center text-gray-600 font-light">
+                    <CheckCircle className="w-3 h-3 mr-2 text-gray-400" strokeWidth={1} />
+                    Fundraise Managed
+                  </div>
+                </div>
+                <p className="text-xl text-gray-600 mt-6 font-light">
+                  <span className="text-gray-900 font-normal">You build. We support. Fully integrated.</span>
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-purple-600 to-pink-600 opacity-90" />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="container mx-auto relative z-10 text-center">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <h2 className="text-5xl md:text-6xl font-black text-white">Ready to Execute?</h2>
-            <p className="text-xl text-white/90 leading-relaxed">
+      <section className="py-24 px-6 bg-gray-50">
+        <div className="container mx-auto max-w-4xl text-center">
+          <div className="space-y-8">
+            <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">Ready to Execute?</h2>
+            <p className="text-xl text-gray-600 leading-relaxed font-light">
               Stop planning. Start building. We're here to execute alongside you every step of the way.
             </p>
-            <div className="text-3xl font-bold text-white mb-8">🚀 Your Execution Partner Awaits</div>
+            <div className="text-2xl font-light text-gray-900 mb-8">🚀 Your Execution Partner Awaits</div>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button
                 size="lg"
-                className="bg-white text-gray-900 hover:bg-gray-100 text-xl px-16 py-8 rounded-2xl font-bold shadow-2xl hover:scale-105 transition-all duration-300"
+                className="bg-gray-900 text-white hover:bg-gray-800 px-12 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 group"
                 onClick={() =>
                   window.open(
                     "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
@@ -570,25 +708,25 @@ export default function ServicesPage() {
                 }
               >
                 Start Executing Now
-                <Sparkles className="ml-3 h-6 w-6" />
+                <Sparkles className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={1} />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 text-xl px-16 py-8 rounded-2xl font-bold transition-all duration-300 hover:scale-105"
+                className="border-gray-300 text-gray-600 hover:bg-gray-50 px-12 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 group"
               >
                 Schedule Discovery Call
-                <ArrowRight className="ml-3 h-6 w-6" />
+                <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={1} />
               </Button>
             </div>
 
-            <div className="flex items-center justify-center space-x-8 pt-8 text-white/80">
+            <div className="flex items-center justify-center space-x-8 pt-8 text-gray-500 font-light">
               <div className="flex items-center space-x-2">
-                <Phone className="h-5 w-5" />
+                <Phone className="h-4 w-4" strokeWidth={1} />
                 <span>+91 95996 91123</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Mail className="h-5 w-5" />
+                <Mail className="h-4 w-4" strokeWidth={1} />
                 <span>info@venturecrafters.in</span>
               </div>
             </div>
@@ -597,44 +735,41 @@ export default function ServicesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black/50 backdrop-blur-xl py-16 border-t border-white/10 px-4">
-        <div className="container mx-auto">
+      <footer className="py-16 px-6 border-t border-gray-100">
+        <div className="container mx-auto max-w-4xl">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
-              <img src="/images/venturecrafters-latest-logo.png" alt="VentureCrafters Logo" className="h-12 w-auto" />
+              <img
+                src="/images/venturecrafters-latest-logo.png"
+                alt="VentureCrafters Logo"
+                className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity duration-300"
+              />
             </div>
-            <p className="text-gray-400 text-lg">Building the future, one startup at a time.</p>
-            <div className="flex justify-center space-x-8">
-              <Link href="/" className="text-gray-400 hover:text-cyan-400 transition-colors">
-                Home
-              </Link>
-              <Link href="/about" className="text-gray-400 hover:text-purple-400 transition-colors">
-                About
-              </Link>
-              <Link href="/services" className="text-cyan-400 font-semibold">
-                Services
-              </Link>
-              <Link href="/portfolio" className="text-gray-400 hover:text-pink-400 transition-colors">
-                Portfolio
-              </Link>
-              <Link href="/contact" className="text-gray-400 hover:text-orange-400 transition-colors">
-                Contact
-              </Link>
+            <p className="text-gray-500 font-light">Building the future, one startup at a time.</p>
+            <div className="flex justify-center space-x-8 text-sm">
+              {["Home", "About", "Services", "Portfolio", "Contact"].map((item) => (
+                <Link
+                  key={item}
+                  href={item === "Home" ? "/" : item === "Services" ? "/services" : `/${item.toLowerCase()}`}
+                  className={`font-light transition-all duration-300 relative group ${
+                    item === "Services" ? "text-gray-900" : "text-gray-500 hover:text-gray-900"
+                  }`}
+                >
+                  {item}
+                  <span
+                    className={`absolute -bottom-1 left-0 h-px bg-gray-900 transition-all duration-300 ${
+                      item === "Services" ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
+                </Link>
+              ))}
             </div>
-            <div className="pt-8 border-t border-white/10 text-gray-500">
+            <div className="pt-8 border-t border-gray-100 text-gray-400 text-sm font-light">
               <p>&copy; 2024 VentureCrafters. All rights reserved.</p>
             </div>
           </div>
         </div>
       </footer>
-
-      <style jsx>{`
-        @keyframes grid-float {
-          0%, 100% { transform: translate(0, 0) rotate(0deg); }
-          33% { transform: translate(30px, -30px) rotate(1deg); }
-          66% { transform: translate(-20px, 20px) rotate(-1deg); }
-        }
-      `}</style>
     </div>
   )
 }
