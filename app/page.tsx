@@ -353,11 +353,9 @@ export default function VentureCraftersLanding() {
                 </ul>
               </CardContent>
               <div className="p-6 pt-0 mt-auto">
-                <p className="text-2xl font-light text-center text-gray-800 mb-4">
-                  AED 5,000<span className="text-base text-gray-500">/month</span>
-                </p>
+                <p className="text-lg font-light text-center text-gray-800 mb-4">Membership-based</p>
                 <Button asChild className="w-full bg-gray-800 hover:bg-gray-900 text-white rounded-none py-3">
-                  <Link href="/ecosystem-access">View Details</Link>
+                  <Link href="/ecosystem-access">Learn More</Link>
                 </Button>
               </div>
             </Card>

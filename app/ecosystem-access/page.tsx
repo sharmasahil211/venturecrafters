@@ -31,39 +31,6 @@ export default function EcosystemAccessPage() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const includedFeatures = [
-    {
-      icon: Zap,
-      title: "$2,000+ in Founder Tools",
-      description: "Access to HirtIQ, Planning, Datarooms, and more to build efficiently.",
-    },
-    {
-      icon: Wrench,
-      title: "Monthly Execution Support",
-      description: "4 hours/month with experienced ex-founders to solve real problems.",
-    },
-    {
-      icon: Brain,
-      title: "High-Signal Mentorship",
-      description: "5 hours/month with domain experts for targeted, actionable advice.",
-    },
-    {
-      icon: Briefcase,
-      title: "Curated Freelancer Pool",
-      description: "Connect with freelancers who think and operate like startup founders.",
-    },
-    {
-      icon: Sparkles,
-      title: "Exclusive Community & Events",
-      description: "Invite-only online and offline events that deliver insights, not speeches.",
-    },
-    {
-      icon: Rocket,
-      title: "Investor Access (When Ready)",
-      description: "Get intros when your deck, traction, and story are ready for funding.",
-    },
-  ]
-
   const toolStack = {
     HIRING: [
       { name: "HirtIQ", description: "AI-based talent curation + auto job posting" },
@@ -256,7 +223,7 @@ export default function EcosystemAccessPage() {
       <section id="what-you-get" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">💡 What You Get (AED 5,000/month)</h2>
+            <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">💡 What You Get</h2>
             <p className="mt-4 text-lg md:text-xl text-gray-600 font-light">
               We’ve bundled everything a founder needs into one powerful access pass.
             </p>
@@ -407,7 +374,7 @@ export default function EcosystemAccessPage() {
       <section className="py-16 md:py-24 px-4 md:px-6">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">💰 Value vs. Cost</h2>
+            <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">💰 The Value</h2>
           </div>
           <Card className="border-0 shadow-xl">
             <CardContent className="p-8 md:p-12">
@@ -428,11 +395,17 @@ export default function EcosystemAccessPage() {
                   ))}
                 </div>
                 <div className="text-center bg-gray-50 p-8 rounded-none">
-                  <p className="text-gray-500 font-light text-sm uppercase tracking-wider">Total Market Value</p>
-                  <p className="text-3xl font-light text-gray-800 my-2 line-through">$30,000-$40,000/month</p>
+                  <p className="text-gray-500 font-light text-sm uppercase tracking-wider">Total Monthly Value</p>
+                  <p className="text-4xl font-extralight text-gray-900 my-2">$5,200+</p>
                   <p className="text-gray-500 font-light text-sm uppercase tracking-wider mt-6">Your Access</p>
-                  <p className="text-5xl font-extralight text-gray-900 my-2">AED 5,000</p>
-                  <p className="text-gray-600 font-light">per month</p>
+                  <p className="text-2xl font-light text-gray-800 my-2">Priced for Founders</p>
+                  <p className="text-gray-600 font-light">Contact us for membership details.</p>
+                  <Button
+                    className="mt-4 bg-gray-900 text-white hover:bg-gray-800 px-6 py-2 rounded-none font-light text-sm"
+                    onClick={() => scrollTo("how-to-join")}
+                  >
+                    Apply for Access
+                  </Button>
                 </div>
               </div>
             </CardContent>
