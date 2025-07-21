@@ -24,13 +24,18 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
+import dynamic from "next/dynamic"
+
+const ParticleCanvas = dynamic(() => import("../components/particle-canvas"), {
+  ssr: false,
+})
 
 export default function VentureCraftersLanding() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrollY, setScrollY] = useState(0)
   const [microSaasDropdownOpen, setMicroSaasDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -46,99 +51,6 @@ export default function VentureCraftersLanding() {
     return () => {
       window.removeEventListener("scroll", handleScroll)
       document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    let animationFrameId: number
-    let particles: { x: number; y: number; size: number; speedX: number; speedY: number }[] = []
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight * 1.2 // Make canvas taller to avoid cutoff
-    }
-    resizeCanvas()
-
-    class Particle {
-      x: number
-      y: number
-      size: number
-      speedX: number
-      speedY: number
-      constructor() {
-        this.x = Math.random() * canvas.width
-        this.y = Math.random() * canvas.height
-        this.size = Math.random() * 2 + 1
-        this.speedX = Math.random() * 0.4 - 0.2
-        this.speedY = Math.random() * 0.4 - 0.2
-      }
-      update() {
-        if (this.x > canvas.width || this.x < 0) this.speedX *= -1
-        if (this.y > canvas.height || this.y < 0) this.speedY *= -1
-        this.x += this.speedX
-        this.y += this.speedY
-      }
-      draw() {
-        ctx.fillStyle = "rgba(156, 163, 175, 0.5)"
-        ctx.beginPath()
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-        ctx.fill()
-      }
-    }
-
-    const init = () => {
-      particles = []
-      const numberOfParticles = (canvas.width * canvas.height) / 12000
-      for (let i = 0; i < numberOfParticles; i++) {
-        particles.push(new Particle())
-      }
-    }
-    init()
-
-    const connect = () => {
-      let opacityValue = 1
-      for (let a = 0; a < particles.length; a++) {
-        for (let b = a; b < particles.length; b++) {
-          const distance = Math.sqrt(
-            (particles[a].x - particles[b].x) * (particles[a].x - particles[b].x) +
-              (particles[a].y - particles[b].y) * (particles[a].y - particles[b].y),
-          )
-          if (distance < 120) {
-            opacityValue = 1 - distance / 120
-            ctx.strokeStyle = `rgba(156, 163, 175, ${opacityValue})`
-            ctx.lineWidth = 1
-            ctx.beginPath()
-            ctx.moveTo(particles[a].x, particles[a].y)
-            ctx.lineTo(particles[b].x, particles[b].y)
-            ctx.stroke()
-          }
-        }
-      }
-    }
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      particles.forEach((p) => {
-        p.update()
-        p.draw()
-      })
-      connect()
-      animationFrameId = requestAnimationFrame(animate)
-    }
-    animate()
-
-    window.addEventListener("resize", () => {
-      resizeCanvas()
-      init()
-    })
-
-    return () => {
-      cancelAnimationFrame(animationFrameId)
     }
   }, [])
 
@@ -167,10 +79,13 @@ export default function VentureCraftersLanding() {
       {/* Header and Mobile Menu */}
       <div className="fixed top-4 left-4 md:top-6 md:left-6 z-50">
         <Link href="/" className="group">
-          <img
+          <Image
             src="/images/venturecrafters-text-logo.png"
             alt="VentureCrafters"
+            width={160}
+            height={40}
             className="h-8 md:h-10 w-auto opacity-80 hover:opacity-100 transition-all duration-300"
+            priority
           />
         </Link>
       </div>
@@ -273,7 +188,7 @@ export default function VentureCraftersLanding() {
 
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center pt-20 md:pt-20 pb-16 px-4 md:px-6 relative overflow-hidden">
-        <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full z-0" />
+        <ParticleCanvas />
         <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent z-10" />
 
         <div className="container mx-auto max-w-5xl relative z-20">
@@ -619,9 +534,11 @@ export default function VentureCraftersLanding() {
         <div className="container mx-auto max-w-4xl">
           <div className="text-center space-y-6 md:space-y-8">
             <div className="flex justify-center">
-              <img
+              <Image
                 src="/images/venturecrafters-text-logo.png"
                 alt="VentureCrafters Logo"
+                width={160}
+                height={40}
                 className="h-8 md:h-10 w-auto opacity-60 hover:opacity-100"
               />
             </div>

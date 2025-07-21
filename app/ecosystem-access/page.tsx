@@ -18,9 +18,11 @@ import {
   Target,
   Wrench,
   Star,
+  FileText,
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import Image from "next/image"
 
 const testimonials = [
   {
@@ -129,28 +131,30 @@ export default function EcosystemAccessPage() {
   return (
     <>
       <style jsx global>{`
-        @keyframes marquee {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-50%);
-          }
+      @keyframes marquee {
+        from {
+          transform: translateX(0);
         }
-        .animate-marquee {
-          animation: marquee 80s linear infinite;
+        to {
+          transform: translateX(-50%);
         }
-        .group:hover .animate-marquee {
-          animation-play-state: paused;
-        }
-      `}</style>
+      }
+      .animate-marquee {
+        animation: marquee 80s linear infinite;
+      }
+      .group:hover .animate-marquee {
+        animation-play-state: paused;
+      }
+    `}</style>
       <div className="min-h-screen bg-white text-gray-900 font-light">
         {/* Header and Mobile Menu */}
         <div className="fixed top-4 left-4 md:top-6 md:left-6 z-50">
           <Link href="/" className="group">
-            <img
+            <Image
               src="/images/venturecrafters-text-logo.png"
               alt="VentureCrafters"
+              width={160}
+              height={40}
               className="h-8 md:h-10 w-auto opacity-80 hover:opacity-100 transition-all duration-300"
             />
           </Link>
@@ -464,8 +468,30 @@ export default function EcosystemAccessPage() {
           </div>
         </section>
 
+        {/* Program Details Section */}
+        <section className="py-16 md:py-24 px-4 md:px-6 bg-white">
+          <div className="container mx-auto max-w-4xl text-center">
+            <h2 className="text-3xl md:text-4xl font-extralight text-gray-900 mb-6">
+              Know in detail about the program
+            </h2>
+            <Button
+              size="lg"
+              className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-3 rounded-none font-light text-base"
+              onClick={() =>
+                window.open(
+                  "https://drive.google.com/drive/folders/1bUBxYgkvvDwPOk3tYe3nLbGDNjXCe3Ox?usp=sharing",
+                  "_blank",
+                )
+              }
+            >
+              <FileText className="mr-3 h-5 w-5" strokeWidth={1.5} />
+              View Program PDF
+            </Button>
+          </div>
+        </section>
+
         {/* Value vs Cost */}
-        <section className="py-16 md:py-24 px-4 md:px-6">
+        <section className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
           <div className="container mx-auto max-w-4xl">
             <div className="text-center mb-12 md:mb-16">
               <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">💰 The Value</h2>
@@ -489,11 +515,15 @@ export default function EcosystemAccessPage() {
                     ))}
                   </div>
                   <div className="text-center bg-gray-50 p-8 rounded-none">
-                    <p className="text-gray-500 font-light text-sm uppercase tracking-wider mt-6">Your Access</p>
-                    <p className="text-2xl font-light text-gray-800 my-2">Priced for Founders</p>
-                    <p className="text-gray-600 font-light">Contact us for membership details.</p>
+                    <p className="text-gray-500 font-light text-sm uppercase tracking-wider">Your Access</p>
+                    <p className="text-3xl font-light text-gray-900 my-2">
+                      Starts at <span className="font-medium">5000 AED</span>
+                    </p>
+                    <p className="text-gray-600 font-light">
+                      Early bird discounts available based on our conversation.
+                    </p>
                     <Button
-                      className="mt-4 bg-gray-900 text-white hover:bg-gray-800 px-6 py-2 rounded-none font-light text-sm"
+                      className="mt-6 bg-gray-900 text-white hover:bg-gray-800 px-6 py-2 rounded-none font-light text-sm"
                       onClick={() => scrollTo("how-to-join")}
                     >
                       Apply for Access
@@ -506,7 +536,7 @@ export default function EcosystemAccessPage() {
         </section>
 
         {/* How to Get In Section */}
-        <section id="how-to-join" className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
+        <section id="how-to-join" className="py-16 md:py-24 px-4 md:px-6 bg-white">
           <div className="container mx-auto max-w-4xl">
             <div className="text-center mb-12 md:mb-16">
               <h2 className="text-3xl md:text-4xl font-extralight text-gray-900">🛣️ How to Get In</h2>
@@ -625,9 +655,11 @@ export default function EcosystemAccessPage() {
           <div className="container mx-auto max-w-4xl">
             <div className="text-center space-y-6 md:space-y-8">
               <div className="flex justify-center">
-                <img
+                <Image
                   src="/images/venturecrafters-text-logo.png"
                   alt="VentureCrafters Logo"
+                  width={160}
+                  height={40}
                   className="h-8 md:h-10 w-auto opacity-60 hover:opacity-100"
                 />
               </div>

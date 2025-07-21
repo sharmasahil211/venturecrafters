@@ -31,6 +31,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 
 export default function ServicesPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -121,9 +122,11 @@ export default function ServicesPage() {
       {/* Logo */}
       <div className="fixed top-6 left-6 z-50">
         <Link href="/" className="group">
-          <img
+          <Image
             src="/images/venturecrafters-latest-logo.png"
             alt="VentureCrafters"
+            width={32}
+            height={32}
             className={`h-8 w-auto transition-all duration-500 ${
               scrollY > 100 ? "opacity-60 scale-90" : "opacity-100 scale-100"
             } hover:opacity-100 hover:scale-100`}
@@ -713,7 +716,7 @@ export default function ServicesPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-gray-300 text-gray-600 hover:bg-gray-50 px-12 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 group"
+                className="border-gray-300 text-gray-600 hover:bg-gray-50 px-12 py-4 rounded-none font-light text-lg transition-all duration-300 hover:scale-105 group bg-transparent"
               >
                 Schedule Discovery Call
                 <ArrowRight className="ml-3 h-5 w-5 transition-transform group-hover:translate-x-1" strokeWidth={1} />
@@ -739,9 +742,11 @@ export default function ServicesPage() {
         <div className="container mx-auto max-w-4xl">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
-              <img
+              <Image
                 src="/images/venturecrafters-latest-logo.png"
                 alt="VentureCrafters Logo"
+                width={32}
+                height={32}
                 className="h-8 w-auto opacity-60 hover:opacity-100 transition-opacity duration-300"
               />
             </div>
