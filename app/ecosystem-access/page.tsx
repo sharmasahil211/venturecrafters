@@ -413,7 +413,7 @@ export default function EcosystemAccessPage() {
                 </Card>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
                 {/* Freelancer Pool */}
                 <Card className="border-0 shadow-lg">
                   <CardHeader>
@@ -464,6 +464,145 @@ export default function EcosystemAccessPage() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Access to Events */}
+              <div className="flex justify-center">
+                <div className="w-full md:w-1/2">
+                  <Card className="border-0 shadow-lg">
+                    <CardHeader>
+                      <CardTitle className="text-xl font-light text-gray-900 flex items-center">
+                        <Calendar className="h-5 w-5 mr-2 text-gray-400" strokeWidth={1.5} />
+                        7. Exclusive Events Access
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 font-light text-sm">
+                        Access to curated founder meets, mentor sessions, investor AMAs, and VC partner discussions.
+                        Network with the right people at the right time.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section className="py-16 md:py-24 px-4 md:px-6 bg-white">
+          <div className="container mx-auto max-w-4xl">
+            <div className="text-center mb-12 md:mb-16">
+              <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">💰 Pricing</h2>
+              <p className="mt-4 text-lg md:text-xl text-gray-600 font-light">
+                Simple, transparent pricing for comprehensive ecosystem access
+              </p>
+            </div>
+
+            <div className="flex justify-center">
+              <Card className="border-0 shadow-xl max-w-md w-full">
+                <CardContent className="p-8 text-center">
+                  <div className="mb-6">
+                    <div className="text-5xl font-extralight text-gray-900 mb-2">
+                      1,000 <span className="text-2xl text-gray-500">AED</span>
+                    </div>
+                    <p className="text-gray-600 font-light">per month</p>
+                  </div>
+
+                  <div className="space-y-4 mb-8 text-left">
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-600 font-light">$2,000+ worth of founder tools</span>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-600 font-light">4 hours/month execution support</span>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-600 font-light">5 hours/month strategic mentorship</span>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-600 font-light">Access to vetted freelancer pool</span>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-600 font-light">High-signal founder community</span>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-600 font-light">Investor access & warm intros</span>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-600 font-light">Exclusive events & networking</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    size="lg"
+                    className="w-full bg-gray-900 text-white hover:bg-gray-800 px-8 py-3 rounded-none font-light text-base"
+                    onClick={() =>
+                      window.open(
+                        "https://docs.google.com/forms/d/e/1FAIpQLSdFkI2Rwm14GrK-T9M4Qbrn6nu9V03--G7gLIgeQcR-docV3g/viewform?usp=dialog",
+                        "_blank",
+                      )
+                    }
+                  >
+                    Apply for Access
+                  </Button>
+
+                  <p className="text-sm text-gray-500 font-light mt-4">
+                    No setup fees • Cancel anytime • 30-day money-back guarantee
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Community Insights Section */}
+        <section className="py-16 md:py-24 px-4 md:px-6 bg-white">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-12 md:mb-16">
+              <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">📊 Community Insights</h2>
+              <p className="mt-4 text-lg md:text-xl text-gray-600 font-light">
+                Real data from our thriving founder ecosystem
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <Card className="border-0 shadow-lg text-center">
+                <CardContent className="p-6">
+                  <div className="text-3xl font-extralight text-gray-900 mb-2">73%</div>
+                  <p className="text-gray-600 font-light text-sm">
+                    Of founders secured their first paying customer within 90 days of joining
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-0 shadow-lg text-center">
+                <CardContent className="p-6">
+                  <div className="text-3xl font-extralight text-gray-900 mb-2">$2.4M</div>
+                  <p className="text-gray-600 font-light text-sm">Total fundraise by community members in first year</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-0 shadow-lg text-center">
+                <CardContent className="p-6">
+                  <div className="text-3xl font-extralight text-gray-900 mb-2">100+</div>
+                  <p className="text-gray-600 font-light text-sm">Active startups across GCC, USA, Europe and Asia</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-0 shadow-lg text-center">
+                <CardContent className="p-6">
+                  <div className="text-3xl font-extralight text-gray-900 mb-2">92%</div>
+                  <p className="text-gray-600 font-light text-sm">
+                    Founder retention rate - they stay because it works
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
@@ -471,9 +610,7 @@ export default function EcosystemAccessPage() {
         {/* Program Details Section */}
         <section className="py-16 md:py-24 px-4 md:px-6 bg-white">
           <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl md:text-4xl font-extralight text-gray-900 mb-6">
-              Know in detail about the program
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-extralight text-gray-900 mb-6">Know about community in detail</h2>
             <Button
               size="lg"
               className="bg-gray-900 text-white hover:bg-gray-800 px-8 py-3 rounded-none font-light text-base"
@@ -485,53 +622,8 @@ export default function EcosystemAccessPage() {
               }
             >
               <FileText className="mr-3 h-5 w-5" strokeWidth={1.5} />
-              View Program PDF
+              View Community PDF
             </Button>
-          </div>
-        </section>
-
-        {/* Value vs Cost */}
-        <section className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
-          <div className="container mx-auto max-w-4xl">
-            <div className="text-center mb-12 md:mb-16">
-              <h2 className="text-4xl md:text-5xl font-extralight text-gray-900">💰 The Value</h2>
-            </div>
-            <Card className="border-0 shadow-xl">
-              <CardContent className="p-8 md:p-12">
-                <div className="grid md:grid-cols-2 gap-8 items-center">
-                  <div className="space-y-4">
-                    {[
-                      { feature: "Tools & Platforms Access", value: "$2,000+" },
-                      { feature: "Execution Support (4 hrs)", value: "$1,200+" },
-                      { feature: "Mentorship (5 hrs)", value: "$1,000+" },
-                      { feature: "Events & Founder Clinics", value: "$500+" },
-                      { feature: "Community, Templates, Vault", value: "$500+" },
-                      { feature: "Investor Access", value: "Priceless" },
-                    ].map((item) => (
-                      <div key={item.feature} className="flex justify-between items-center text-sm border-b pb-2">
-                        <span className="text-gray-600 font-light">{item.feature}</span>
-                        <span className="font-medium text-gray-800">{item.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="text-center bg-gray-50 p-8 rounded-none">
-                    <p className="text-gray-500 font-light text-sm uppercase tracking-wider">Your Access</p>
-                    <p className="text-3xl font-light text-gray-900 my-2">
-                      Starts at <span className="font-medium">5000 AED</span>
-                    </p>
-                    <p className="text-gray-600 font-light">
-                      Early bird discounts available based on our conversation.
-                    </p>
-                    <Button
-                      className="mt-6 bg-gray-900 text-white hover:bg-gray-800 px-6 py-2 rounded-none font-light text-sm"
-                      onClick={() => scrollTo("how-to-join")}
-                    >
-                      Apply for Access
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </section>
 

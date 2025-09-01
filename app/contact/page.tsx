@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Phone, Mail, MapPin, Menu, X } from "lucide-react"
+import { Phone, Mail, Menu, X } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -136,14 +136,7 @@ export default function ContactPage() {
                       </div>
                       <div className="flex items-center space-x-4">
                         <Mail className="h-5 w-5 text-gray-400" strokeWidth={1.5} />
-                        <span className="text-gray-600 font-light">info@venturecrafters.in</span>
-                      </div>
-                      <div className="flex items-start space-x-4">
-                        <MapPin className="h-5 w-5 text-gray-400 mt-1 flex-shrink-0" strokeWidth={1.5} />
-                        <div className="text-gray-600 font-light">
-                          <p className="font-medium text-gray-700">Our Office</p>
-                          <p>Business Bay, Dubai, United Arab Emirates</p>
-                        </div>
+                        <span className="text-gray-600 font-light">team@venturecrafters.ae</span>
                       </div>
                     </div>
                   </CardContent>

@@ -11,7 +11,6 @@ import {
   DollarSign,
   Phone,
   Mail,
-  MapPin,
   Code,
   Menu,
   X,
@@ -464,7 +463,7 @@ export default function VentureCraftersLanding() {
                     size="lg"
                     variant="outline"
                     className="border-gray-300 text-gray-600 hover:bg-gray-50 rounded-none w-full sm:w-auto bg-transparent"
-                    onClick={() => (window.location.href = "mailto:info@venturecrafters.in?subject=Deck Review")}
+                    onClick={() => (window.location.href = "mailto:team@venturecrafters.ae?subject=Deck Review")}
                   >
                     Share Your Deck — Let’s Review
                   </Button>
@@ -493,14 +492,7 @@ export default function VentureCraftersLanding() {
                 </div>
                 <div className="flex items-center space-x-3">
                   <Mail className="h-4 w-4 text-gray-400" strokeWidth={1.5} />
-                  <span className="text-gray-600 font-light">info@venturecrafters.in</span>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <MapPin className="h-4 w-4 text-gray-400 mt-1 flex-shrink-0" strokeWidth={1.5} />
-                  <div className="text-gray-600 font-light">
-                    <p className="font-medium text-gray-700">Our Office</p>
-                    <p>Business Bay, Dubai, United Arab Emirates</p>
-                  </div>
+                  <span className="text-gray-600 font-light">team@venturecrafters.ae</span>
                 </div>
               </div>
             </div>
